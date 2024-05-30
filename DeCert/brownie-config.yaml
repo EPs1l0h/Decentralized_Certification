@@ -1,0 +1,36 @@
+compiler:
+  solc:
+    remappings:
+      - '@openzeppelin=OpenZeppelin/openzeppelin-contracts@3.4.0'
+dotenv: .env
+networks:
+    networks:
+        # any settings given here will replace the defaults
+        development:
+            host: http://127.0.0.1
+            gas_price: 0
+            persist: false
+            reverting_tx_gas_limit: 6721975
+            test_rpc:
+                cmd: ganache-cli
+                port: 8545
+                gas_limit: 6721975
+                accounts: 10
+        # set your Infura API token to the environment variable ${WEB3_INFURA_PROJECT_ID}
+        mainnet:
+            host: https://mainnet.infura.io/v3/${WEB3_INFURA_PROJECT_ID}
+        goerli:
+            host: https://goerli.infura.io/v3/${WEB3_INFURA_PROJECT_ID}
+        kovan:
+            host: https://kovan.infura.io/v3/${WEB3_INFURA_PROJECT_ID}
+        rinkeby:
+            host: https://rinkeby.infura.io/v3/${WEB3_INFURA_PROJECT_ID}
+        ropsten:
+            host: https://ropsten.infura.io/v3/${WEB3_INFURA_PROJECT_ID}
+        classic:
+            host: https://www.ethercluster.com/etc
+        kotti:
+            host: https://www.ethercluster.com/kotti
+wallets:
+  from_key: ${PRIVATE_KEY}
+
