@@ -58,7 +58,6 @@ contract DIDRegistry {
         for (uint i = 0; i < publicKeyPems.length; i++) {
             // Generate VerificationMethod ID using the current index
             string memory verificationMethodId = string(abi.encodePacked(did, "#key-", uintToString(i)));
-
             // Create VerificationMethod
             VerificationMethod memory verificationMethod = VerificationMethod({
                 id: verificationMethodId,
@@ -145,5 +144,6 @@ contract DIDRegistry {
             s[j] = reversed[i - j - 1];
         }
         str = string(s);
+        return str;
     }
 }

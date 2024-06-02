@@ -5,8 +5,8 @@ from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.serialization import load_pem_private_key
 from cryptography.hazmat.primitives.asymmetric.utils import Prehashed
 
-def load_private_key(private_key_pem):
-    return load_pem_private_key(private_key_pem.encode(),)
+def load_private_key(private_key_pem, password=None):
+    return load_pem_private_key(private_key_pem.encode(), password)
 
 def sign_with_rsa(private_key, message):
     signature = private_key.sign(
@@ -19,12 +19,13 @@ def sign_with_rsa(private_key, message):
 def sign_with_sm2(private_key, message):
     signature = private_key.sign(
         message,
-        ec.ECDSA(Prehashed(hashes.SHA256()))
+        ec.ECDSA(hashes.SHA256())
     )
     return signature
 
 def Signature(did_document, type_of_proof, private_key_pem):
     # Load the DID document
+    del did_document["proof"]
     did_document_json = json.dumps(did_document)
     message = did_document_json.encode()
 
