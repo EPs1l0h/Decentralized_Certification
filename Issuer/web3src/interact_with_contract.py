@@ -7,14 +7,18 @@ from web3.exceptions import ContractLogicError  # 导入 ContractLogicError 异�
 w3 = Web3(Web3.HTTPProvider('http://127.0.0.1:8545'))
 
 # 读取ABI
-with open('DIDRegistry_abi.json', 'r') as abi_file:
+b_dir = os.path.dirname(os.path.abspath(__file__))
+c_path = os.path.join(b_dir, 'DIDRegistry_abi.json')
+with open(c_path, 'r') as abi_file:
     abi = json.load(abi_file)
 
 # 使用提供的地址进行交易
 account = '0x23F884761b3779a6fa8016660772f3aA638908AF'
 
 # 从文件中读取合约地址
-with open('contract_address.txt', 'r') as f:
+b_dir = os.path.dirname(os.path.abspath(__file__))
+c_path = os.path.join(b_dir, 'contract_address.txt')
+with open(c_path, 'r') as f:
     contract_address = f.read().strip()
 
 def generate_did(contract_address, context, created, updated, version, publicKeyPems, typesOfKey):

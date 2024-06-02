@@ -25,7 +25,7 @@ def verify_did(contract_address, did_document): # 输入addr
 
     if public_key_pem is None:
         print(False, "Verification method not found")
-        return False, "Verification method not found"
+        return {"msg":"Verification method not found"}
 
     # 加载公钥
     public_key = load_pem_public_key(public_key_pem.encode())
@@ -43,10 +43,10 @@ def verify_did(contract_address, did_document): # 输入addr
             ec.ECDSA(hashes.SHA256())
         )
         print(True, "Verification successful")
-        return True, "Verification successful"
+        return {"msg":"Verification successful"}
     except InvalidSignature:
         print(False, "Invalid signature")
-        return False, "Invalid signature"
+        return {"msg":"Invalid signature"}
     
 
 # test case
@@ -70,4 +70,8 @@ a = {
     "proofValue": "eyJhbGciOiJFUzI1NksiLCJraWQiOiJkaWQ6ZXhhbXBsZToxMjM0NTY3ODlhYmNkZWZnaGlfa2V5LTEiLCJ0eXAiOiJKV1MifQ..Q9JYDNOU0oyJkXW5NcC1hR3U4SHN6U1RiY3pvYkUzam5vY3VtY2tjZERxY3dLd1Z0a1d0Z2pUa0dWY3A0bFZJZw" 
   }
 }
-verify_did(contract_address = "0x7616760fF28f4d35ad4198556B2A7ea930d6FfAf", did_document=a)
+b_dir = os.path.dirname(os.path.abspath(__file__))
+c_path = os.path.join(b_dir, 'contract_address.txt')
+with open (c_path,'r') as file:
+    contract_address = file.read()
+verify_did(contract_address = contract_address, did_document=a)

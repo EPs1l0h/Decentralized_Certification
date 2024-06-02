@@ -96,5 +96,10 @@ vc = {
 }
 
 # 验证 VC
-result, message = verify_vc(vc,"0x7616760fF28f4d35ad4198556B2A7ea930d6FfAf","did:dc:23f884761b3779a6fa8016660772f3aa638908af")
+b_dir = os.path.dirname(os.path.abspath(__file__))
+c_path = os.path.join(b_dir, 'contract_address.txt')
+with open (c_path,'r') as file:
+    contract_address = file.read()
+print(contract_address)
+result, message = verify_vc(vc,contract_address,vc["verifiableCredential"][0]["credentialSubject"]["alumniOf"]["id"])
 print(result, message)
