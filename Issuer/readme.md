@@ -5,9 +5,8 @@
 
 - 运行 `ganache-cli`
 
-- 运行app.py，启动标识符注册机构，如下图开始调试，验证验证不上不知道为什么，每次deploy就会不一样，如果不运行registerDID，verifyDID直接就没法根据did找到diddoocument了，太奇怪了
+- 运行app.py，启动标识符注册机构，看群里说明开始调试，验证验证不上不知道为什么，每次deploy就会不一样，如果不运行registerDID，verifyDID直接就没法根据did找到diddoocument了，太奇怪了，我感觉可能是我没执行路由的问题，你们有空构造点数据把flask服务起起来调，看看行不行
 
-  ![image-20240603040112237](D:\BACKUP\My footprints\BUPT\课件\Decentralized_Certification\Issuer\readme\image-20240603040112237.png)
 
 
 
