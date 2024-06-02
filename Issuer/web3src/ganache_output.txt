@@ -1,10 +1,56 @@
 ganache v7.9.2 (@ganache/cli: 0.10.2, @ganache/core: 0.10.2)
 Starting RPC server
-Error: listen EADDRINUSE: address already in use 127.0.0.1:8545.
-    at C:\Users\18238\AppData\Roaming\npm\node_modules\ganache\dist\node\1.js:2:5133
-    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
-    at async Promise.allSettled (index 1) {
-  code: 'EADDRINUSE'
-}
+
+Available Accounts
+==================
+(0) 0x69Bf5a073E6E6FFd9B6dD70456E464EE79E0E20F (1000 ETH)
+(1) 0x0281c0CFacacDD0DcF3eC0AB9018f06355AB59a0 (1000 ETH)
+(2) 0x9B7A5FF5ed2f389750C9523e7830cEcd84C394e5 (1000 ETH)
+(3) 0xebD1d168Db8904b017C5Fac9Dc1daF44B8379AE6 (1000 ETH)
+(4) 0x4b5ab751024F2D0bc9257Faad10FC8683c4ce75E (1000 ETH)
+(5) 0xcDdC1f53F740484a7f4e2BDA7fb78f4b71968650 (1000 ETH)
+(6) 0xDD2434112276B0814a7c478cd8cb74Cf76f8e549 (1000 ETH)
+(7) 0x7B9Fcb07Da4dfE62F3Eba061f44C5bb3C22d3014 (1000 ETH)
+(8) 0x81c85F13b763c05dECb085cD40c3252eaed45043 (1000 ETH)
+(9) 0x53D483459748be2ab1a793ec5841b12C479e0C75 (1000 ETH)
+
+Private Keys
+==================
+(0) 0x63a3be96889c150acdb77d603997323ab5d352f1c05fb0030eb6ccc7b98413ec
+(1) 0xec85b0d8be1f824c8f58554df18ff668a33be7eb52cb416960002be0abd75f0d
+(2) 0xeada7e2940225032d60b7e8b051a9bf3af8042adeb8153a830b7017d91cf4a73
+(3) 0x87eaa4c285d0cb06da390bd533d47fb115ef5b4af3eefdcd2669c433472d5dbb
+(4) 0xff17e87c9438f0101aa6cfa7e93aa3b8470909f009bd29103bd2100d96ff2ef5
+(5) 0x67a85a2d5f21f0481d181e0414c01c17b6da2603a07c822341fc91a8d9909670
+(6) 0x3f30929c369d859ba3e637fb941a900ddeaf7c5108f758cdc82d269ef8f1f196
+(7) 0xd6b16ff97f6c013f7673ffa4b114050563ec878929993240f026270c24390c9f
+(8) 0x9d220c0332fc8e99886ae34bbf3a7c8c99164ee99a257c8cb300d9c4d48a729f
+(9) 0xdfb057edbcca01465905eb63f58f20e5d3e1d34d3ebc0de3cf13da7c2c74f6ce
+
+HD Wallet
+==================
+Mnemonic:      access pull left wagon element egg foster foster front spy human unit
+Base HD Path:  m/44'/60'/0'/0/{account_index}
+
+Default Gas Price
+==================
+2000000000
+
+BlockGas Limit
+==================
+30000000
+
+Call Gas Limit
+==================
+50000000
+
+Chain
+==================
+Hardfork: shanghai
+Id:       1337
+
+RPC Listening on 127.0.0.1:8545
 
 Received shutdown signal: SIGINT
+Shutting down…
+Server has been shut down

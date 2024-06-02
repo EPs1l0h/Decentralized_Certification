@@ -11,7 +11,7 @@ with open('DIDRegistry_abi.json', 'r') as abi_file:
     abi = json.load(abi_file)
 
 # 使用提供的地址进行交易
-account = '0x7Ca9a1d182fF1456f286981a4c68cAc9590300Fd'
+account = '0x23F884761b3779a6fa8016660772f3aA638908AF'
 
 # 从文件中读取合约地址
 with open('contract_address.txt', 'r') as f:
@@ -24,7 +24,7 @@ def generate_did(contract_address, context, created, updated, version, publicKey
         context, created, updated, version, publicKeyPems, typesOfKey
     ).transact({'from': account})
     tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-    logs = contract.events.DIDCreated().processReceipt(tx_receipt)
+    logs = contract.events.DIDCreated().process_receipt(tx_receipt)
     return logs[0]['args']['did']
 
 def get_did_document(contract_address, did):
@@ -57,23 +57,22 @@ if __name__ == "__main__":
         if "DID already exists for this address" in str(e):
             print("DID already exists for this address.")
             # 假设我们知道 DID，可以设置一个已知的 DID 进行测试
-            did = "did:dc:7ca9a1d182ff1456f286981a4c68cac9590300fd"
+            did = "did:dc:23f884761b3779a6fa8016660772f3aa638908af"
         else:
             raise
 
     # 获取DID Document
     did_document = get_did_document(contract_address, did)
-    print(type(did_document))
     print(f"DID Document: {did_document}")
 
     # 添加证明信息
     add_proof(
         contract_address,
-        did,
-        "exampleProof",
-        "2023-06-01T00:00:00Z",
-        "assertionMethod",
-        "did:dc:123#key-0",
+        did, 
+        "exampleProof", 
+        "2023-06-01T00:00:00Z", 
+        "assertionMethod", 
+        "did:dc:123#key-0", 
         "proofValue"
     )
     updated_did_document = get_did_document(contract_address, did)

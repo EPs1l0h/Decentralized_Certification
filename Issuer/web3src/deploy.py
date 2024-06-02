@@ -12,7 +12,7 @@ with open('DIDRegistry_bytecode.txt', 'r') as bytecode_file:
     bytecode = bytecode_file.read()
 
 # 使用提供的地址进行交易
-account = '0x7Ca9a1d182fF1456f286981a4c68cAc9590300Fd'
+account = '0x23F884761b3779a6fa8016660772f3aA638908AF'
 
 # 部署合约
 DIDRegistry = w3.eth.contract(abi=abi, bytecode=bytecode)
