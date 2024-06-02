@@ -1,49 +1,55 @@
-Ganache CLI v6.12.2 (ganache-core: 2.13.2)
+ganache v7.9.2 (@ganache/cli: 0.10.2, @ganache/core: 0.10.2)
+Starting RPC server
 
 Available Accounts
 ==================
-(0) 0x2899925460d9Fc6EF7523E61E53528178B1864a1 (100 ETH)
-(1) 0x550Ef58162e78B84033fd72954b16eE0981fE087 (100 ETH)
-(2) 0x16B37bCe78EA041118D0c67a87d5E9c8dAbC154d (100 ETH)
-(3) 0xc7B8f04a06BD9c6D9122DE65E2f7D4dF57c2a5b4 (100 ETH)
-(4) 0xe05880BDE6362197536ccF7A8c0fAFa40fc3eDD6 (100 ETH)
-(5) 0xe5bc7AdA97D524747d31848A6627820741D72aA0 (100 ETH)
-(6) 0xaF50D31fCe4B6e378dc905d04c0bD84763474Fa0 (100 ETH)
-(7) 0xd3fef463164Df381ADC0e55B6C63119EC6DfCFbb (100 ETH)
-(8) 0x9BF7558aEfFd986E9FD64c3ff5746AD687937567 (100 ETH)
-(9) 0x4d76ba23cB54Ae027F0c205722611d538Fbeed02 (100 ETH)
+(0) 0x78a4c460bDBcAD2de3c4af887662035957fe4a30 (1000 ETH)
+(1) 0x8a74721cA612BB316D0590caa99bAA5aF1a3CeaF (1000 ETH)
+(2) 0x6d5348C5478c850c7a6A8B20c23Ef0D1D09AF37F (1000 ETH)
+(3) 0x9ffE2cC2c7f5828098B43CE6ad0038A1a9124C63 (1000 ETH)
+(4) 0x885fc47271Ae91d6df49385eDcF1935f5D49A1dB (1000 ETH)
+(5) 0xBfd489127E376d96c05D23B23A98cEfAfaB7401D (1000 ETH)
+(6) 0xE6146593b5bBC68B01Eb89d58728FFd59Ab5E5c0 (1000 ETH)
+(7) 0xE96d3173e96473bb16bD42D66123320DcDb05480 (1000 ETH)
+(8) 0x76876e34Bd2A3Ac641e8a605050980da2990f1C1 (1000 ETH)
+(9) 0xd3e25c067045cCD84e8E025E88fAfaf3A0b9D514 (1000 ETH)
 
 Private Keys
 ==================
-(0) 0xccae6516b64538202a76e4878c4f9f41b4d339da7256ba709331c23561c68e4c
-(1) 0xa1d52c64c15b5903a923e3bb0b922145a4fe23b78b4df35cfe43b70a534f0e58
-(2) 0x30f46f060edf478c8a743cbb19102acfc53c3be1e0742adf905e9933edde3020
-(3) 0x3f35450f70dacd90f7601f1bf97402cd8f7e1d9d96e70930b0eb26d37681dd34
-(4) 0xd59915df693b545520047db8e4a7078dba7e5a9bca798c4e5dfc5d7ac9cb6cf2
-(5) 0x0222653dc491238859b07f31588e423ad1bb4c23898d7222011d130745d4a79c
-(6) 0x77001e01bbbf7e5b4e02b2597cebab0b8359650c61047f3a6f4a2299cf25ecf0
-(7) 0x7d76ceaba5e9cc5e34302e8f09bcf445da3a1ff49593f6ad639f0335f859db59
-(8) 0x1598371e2f76686586fe2468a4fc0d30856a4a50d074d0c0c8b5afb949c3124d
-(9) 0xea0518434dc7f2b02c62c4364c2051e4d7b1a1bac45358a1cce6767481a8186b
+(0) 0x687edd51035620b9e69ef94b4a70e062dd32259411628175a1f24be7d33b4389
+(1) 0xd15803e5f5d6ac6fbcc7ef8be7e42b3bb6e541658fcb73f96a43fe3e9bc80c7c
+(2) 0xc7a32c1ed4cd6f8c44b859762da30c1f500c2f8d99a276505d27670e199ce5ed
+(3) 0xf2187366c200d0fcfcc4f1ecc0c0c129f1cbefc47ccb74a3e05e0ad6860077ad
+(4) 0xfb3f5152f479d5e4ec18216439034d3aa92c394807a1c4fe13bc85ce08531c2f
+(5) 0xbbbd07ae3f4bbf240880bca4564de1f67c6fb7dc3a453bdd047a696d436160dc
+(6) 0x6aa48ff8330b73bcd6eefde27cd1c9c3219c945dfaaa65aeb186124474c34a30
+(7) 0x19c24197b51482771903bd53e3153b9ab582bed2b5380235ff5c46b8af356a81
+(8) 0x0b758f7e8105005fd346699ba418c82e8f284ca294b02d4ca235bdcf4f17b1dc
+(9) 0x982baa3d200cb8c56a80f889500787d401122202ccaf36e55575401df616b226
 
 HD Wallet
 ==================
-Mnemonic:      know opera clean despair coin color garment magic disagree another will remain
+Mnemonic:      flee stove universe enforce kite joke under category lizard setup fox jar
 Base HD Path:  m/44'/60'/0'/0/{account_index}
 
-Gas Price
+Default Gas Price
 ==================
-20000000000
+2000000000
 
-Gas Limit
+BlockGas Limit
 ==================
-6721975
+30000000
 
 Call Gas Limit
 ==================
-9007199254740991
+50000000
 
-Listening on 127.0.0.1:8545
+Chain
+==================
+Hardfork: shanghai
+Id:       1337
+
+RPC Listening on 127.0.0.1:8545
 eth_getBlockByNumber
 eth_chainId
 eth_chainId
@@ -52,10 +58,15 @@ eth_blockNumber
 eth_getBlockByNumber
 eth_sendTransaction
 
-  Transaction: 0x6c98bdec3d7b50c5b1153af23bfd8c31947d17cfacc795a4cf0ccda44f0c5065
-  Contract created: 0xdea2ad58959c3e203ad344089cda22ac716a74e4
-  Gas usage: 2179987
-  Block Number: 1
-  Block Time: Sun Jun 02 2024 17:01:41 GMT+0800 (中国标准时间)
+  Transaction: 0x7d7ec02017e0a9b94c125e5efbeb0e6195d30ccf379d150ef57af9d9e6a58fcd
+  Contract created: 0x83e60416035f522444c7be67da77a6347e453fe5
+  Gas usage: 2180607
+  Block number: 1
+  Block time: Sun Jun 02 2024 20:57:31 GMT+0800 (中国标准时间)
 
 eth_getTransactionReceipt
+
+Received shutdown signal: SIGHUP
+Shutting down…
+Server has been shut down
+^C

@@ -39,7 +39,6 @@ contract DIDRegistry {
     mapping(address => string) private addressToDID;
 
     event DIDCreated(string did, address owner);
-
     function generateDID(
         string memory context,
         string memory created,
@@ -61,12 +60,21 @@ contract DIDRegistry {
         didDocument.created = created;
         didDocument.updated = updated;
         didDocument.version = version;
-
+        string[] memory key_id = new string[](10);
+        key_id[0] = '1';
+        key_id[1] = '2';
+        key_id[2] = '3';
+        key_id[3] = '4';
+        key_id[4] = '5';
+        key_id[5] = '6';
+        key_id[6] = '7';
+        key_id[7] = '8';
+        key_id[8] = '9';
+        key_id[9] = '10';
         // Loop through the public keys and types of key to create verification methods
         for (uint i = 0; i < publicKeyPems.length; i++) {
             // Generate VerificationMethod ID using the current index
-            string memory verificationMethodId = string(abi.encodePacked(did, "#key-", uintToString(i)));
-
+            string memory verificationMethodId = string(abi.encodePacked(did, "#key-", key_id[i]));
             // Create VerificationMethod
             VerificationMethod memory verificationMethod = VerificationMethod({
                 id: verificationMethodId,
@@ -137,22 +145,6 @@ contract DIDRegistry {
     function char(bytes1 b) internal pure returns (bytes1 c) {
         if (uint8(b) < 10) return bytes1(uint8(b) + 0x30);
         else return bytes1(uint8(b) + 0x57);
-    }
-
-    function uintToString(uint v) internal pure returns (string memory str) {
-        uint maxlength = 100;
-        bytes memory reversed = new bytes(maxlength);
-        uint i = 0;
-        while (v != 0) {
-            uint remainder = v % 10;
-            v = v / 10;
-            reversed[i++] = bytes1(uint8(48 + remainder));
-        }
-        bytes memory s = new bytes(i);
-        for (uint j = 0; j < i; j++) {
-            s[j] = reversed[i - j - 1];
-        }
-        str = string(s);
     }
 }
 '''
