@@ -1,7 +1,7 @@
 from web3 import Web3
 import json
 import os
-from web3.exceptions import ContractLogicError  # 导入 ContractLogicError 异常
+from web32.exceptions import ContractLogicError  # 导入 ContractLogicError 异常
 
 # 连接到以太坊节点 (这里以本地节点为例)
 w3 = Web3(Web3.HTTPProvider('http://127.0.0.1:8545'))

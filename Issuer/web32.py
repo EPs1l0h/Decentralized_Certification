@@ -5,7 +5,7 @@ import re
 output_file = 'ganache_output.txt'
 
 # 启动Ganache并将输出重定向到临时文件
-os.system(f'ganache-cli > {output_file} 2>&1')
+os.system(f'ganache > {output_file} 2>&1')
 
 # 读取输出
 with open(output_file, 'r', encoding='utf-8') as file:
@@ -31,4 +31,4 @@ for i, (account, private_key) in enumerate(account_private_key_pairs):
     print(f"Account {i}: {account}, Private Key: {private_key}")
 
 # 删除临时文件
-# os.remove(output_file)
+os.remove(output_file)
