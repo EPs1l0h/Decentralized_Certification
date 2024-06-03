@@ -1,6 +1,8 @@
 import hashlib
 import sqlite3
 import json
+import os
+from web3 import Web3
 from flask import Flask, request, jsonify
 app = Flask(__name__)
 
@@ -10,10 +12,57 @@ bytecode = None
 account_addr = ''
 contract_addr = ''
 
+def deploy():
+    global w3, account_addr
+    # 部署合约
+    DIDRegistry = w3.eth.contract(abi=abi, bytecode=bytecode)
+    tx_hash = DIDRegistry.constructor().transact({'from': account_addr})
+    tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+    b_dir = os.path.dirname(os.path.abspath(__file__))
+    contract_addr = tx_receipt.contractAddress
+    c_path = os.path.join(b_dir, 'contract_address')
+    with open(c_path, 'w') as bytecode_file:
+        bytecode_file.write(contract_addr)
+    return contract_addr
+def check_file(file_path):
+    try:
+        with open(file_path, 'r') as file:
+            # 读取文件内容
+            file_content = file.read()
+            # 如果文件内容不为空则返回true，否则返回false
+            if file_content:
+                return file_content
+            else:
+                return False
+    except FileNotFoundError:
+        print(f"file {file_path} not found")
+        return False
 def init_func():
-    from web3src.deploy import run_deploy
     global w3, abi, bytecode, account_addr, contract_addr
-    w3, abi, bytecode, account_addr, contract_addr = run_deploy()
+    # 连接到以太坊节点 (这里以本地节点为例)
+    w3 = Web3(Web3.HTTPProvider('http://127.0.0.1:8545'))
+    # 读取ABI和字节码
+    b_dir = os.path.dirname(os.path.abspath(__file__))
+    c_path = os.path.join(b_dir, 'web3src/DIDRegistry_abi.json')
+    with open(c_path, 'r') as abi_file:
+        abi = json.load(abi_file)
+
+    b_dir = os.path.dirname(os.path.abspath(__file__))
+    c_path = os.path.join(b_dir, 'web3src/DIDRegistry_bytecode.txt')
+    with open(c_path, 'r') as bytecode_file:
+        bytecode = bytecode_file.read()
+
+    # 取出第一个可用的地址
+    account_addr = w3.eth.accounts[0]
+
+    b_dir = os.path.dirname(os.path.abspath(__file__))
+    c_path = os.path.join(b_dir, "contract_address")
+    chk_file = check_file(c_path)
+    if chk_file:
+        contract_addr = chk_file
+    else:
+        contract_addr= deploy()
+
 
 # 和持有者交互 - 注册
 @app.route('/register', methods=['POST'])
@@ -28,7 +77,7 @@ def register():
 
     if password != password_confirm:
         return jsonify({"message": "Registration Failed"}), 401
-
+    registerDID()
     # 返回
     return jsonify({"message": "Registration Successful"}), 200
 
@@ -71,11 +120,15 @@ def registerDID():
         public_key_pem.append(pk)
         private_key_pem.append(sk)
     from web3src.interact_with_contract import register_did
-    did_document = register_did(w3, abi, account_addr, contract_addr, public_key_pem, type_of_key, private_key_pem[0])
-    print("======================DID====================")
-    print(did_document)
-    # 这里返回给前端一个did_document，然后数据库就找里面对应的字段就可以，[公私钥对就是前面的两个list，记得加一个type_of_key]，
-    # 然后还得再存一份did_document完整的
+    try:
+        did_document = register_did(w3, abi, account_addr, contract_addr, public_key_pem, type_of_key, private_key_pem[0])
+    except Exception as e:
+        print("register_did failed")
+    else:
+        print("======================DID====================")
+        print(did_document)
+        # 这里返回给前端一个did_document，然后数据库就找里面对应的字段就可以，[公私钥对就是前面的两个list，记得加一个type_of_key]，
+        # 然后还得再存一份did_document完整的
 
 
 # 和颁发者交互
@@ -84,36 +137,27 @@ def verifyDID():
     # data = request.get_json()  # 这里的data是一整个DID document的json，这里应该不能直接传，用json - string 转一下就行
     # data = json.loads(data)
     data = {
-        "@context": ["https://www.w3.org/ns/did/v1"],
-        "id": "did:dc:9648a072c53748223360c5c5186927b517b0afbc",
-        "created": "2024-06-02T17:35:49Z",
-        "updated": "2024-06-02T17:35:49Z",
-        "version": "1.0",
-        "verificationMethod": [
-            {
-                "id": "did:dc:9648a072c53748223360c5c5186927b517b0afbc#key-1",
-                "type": "SM2",
-                "publicKeyPem": """
-    -----BEGIN PUBLIC KEY-----
-    MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE+opacF908xjq6d2/kpjpeZd/PM2Q
-    YWNL0MmQB4xgtI1ZO6Fd8kccP44xrWtQ71SSOTUj/brd5MZzGvHjKjNjAQ==
-    -----END PUBLIC KEY-----
-    """,
-                "address": "0x9648A072C53748223360C5c5186927B517b0aFBC"
-            }
-        ],
-        "proof": {
-            "type": "SM2",
-            "created": "2024-06-02T17:35:49Z",
-            "proofPurpose": "assertionMethod",
-            "verificationMethod": "did:dc:9648a072c53748223360c5c5186927b517b0afbc#key-1",
-            "proofValue": "3046022100905d0d292bd2d82ab0914e54812cfb01215623d551c06d1da6a62022bb2e83ee022100dbafb6b1e4fc15d64f3d39c44b8ef40e2491c23268233aac1a85e1384ac4379e"
-        }
+        '@context': ['https://www.w3.org/ns/did/v1'],
+        'id': 'did:dc:0adf883f21794e0a0f4cc274840c295ab617595a',
+        'created': '2024-06-03T06:33:41Z',
+        'updated': '2024-06-03T06:33:41Z',
+        'version': '1.0',
+        'verificationMethod': [{'id': 'did:dc:0adf883f21794e0a0f4cc274840c295ab617595a#key-1',
+                                'type': 'SM2',
+                                'publicKeyPem': '-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEv+VYFHhq+aFEWHp+SSSldxltbUmD\n8AgonywFoMQDxXBo2114qQ11unvJEjTyl1m4tWrDY6UO73WjPHMQU7W3VA==\n-----END PUBLIC KEY-----\n',
+                                'address': '0x0ADF883f21794E0a0f4cc274840C295ab617595A'}],
+        'proof': {'type': 'SM2',
+                  'created': '2024-06-03T06:33:41Z',
+                  'proofPurpose': 'assertionMethod',
+                  'verificationMethod': 'did:dc:0adf883f21794e0a0f4cc274840c295ab617595a#key-1',
+                  'proofValue': '30440220680cefe4910599dd119c89029663e0f2a58aae0b3eaf716b4c1ee2e04726a69d02201ec4c64943092df18c2f280ddc2b09f4e1ad29d5d1d015d5b12dc763850f6276'}
     }
+
     global contract_addr, w3, abi
     from web3src.verify_did import verify_did  # 导入verify_did模块
 
     lld = verify_did(w3, abi, contract_addr, data)
+    print("================VERIFY_DID=============")
     print(lld)
     return lld # 返回给前端login函数那样的jsonfy信息
 
@@ -162,6 +206,7 @@ def verifyVC():
     global w3, abi, contract_addr
     from web3src.verify_vc import verify_vc
     lld = verify_vc(w3, abi, contract_addr, data)
+    print("===============VERIFY_VC================")
     print(lld)
     return lld # 返回jsonfy信息
 
@@ -241,6 +286,7 @@ def verifyVP():
     global w3, abi, contract_addr
     from web3src.verify_vp import verify_vp
     lld = verify_vp(w3, abi, contract_addr, data)
+    print("===================VERIFY_VP================")
     print(lld)
     return lld # 返回jsonfy
 

@@ -28,7 +28,7 @@ def Signature(did_document, type_of_proof, private_key_pem):
     del did_document["proof"]
     did_document_json = json.dumps(did_document)
     message = did_document_json.encode()
-
+    print("message_did: ", message)
     # Load the private key
     private_key = load_private_key(private_key_pem)
 
