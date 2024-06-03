@@ -1,0 +1,72 @@
+ganache v7.9.2 (@ganache/cli: 0.10.2, @ganache/core: 0.10.2)
+Starting RPC server
+
+Available Accounts
+==================
+(0) 0x78a4c460bDBcAD2de3c4af887662035957fe4a30 (1000 ETH)
+(1) 0x8a74721cA612BB316D0590caa99bAA5aF1a3CeaF (1000 ETH)
+(2) 0x6d5348C5478c850c7a6A8B20c23Ef0D1D09AF37F (1000 ETH)
+(3) 0x9ffE2cC2c7f5828098B43CE6ad0038A1a9124C63 (1000 ETH)
+(4) 0x885fc47271Ae91d6df49385eDcF1935f5D49A1dB (1000 ETH)
+(5) 0xBfd489127E376d96c05D23B23A98cEfAfaB7401D (1000 ETH)
+(6) 0xE6146593b5bBC68B01Eb89d58728FFd59Ab5E5c0 (1000 ETH)
+(7) 0xE96d3173e96473bb16bD42D66123320DcDb05480 (1000 ETH)
+(8) 0x76876e34Bd2A3Ac641e8a605050980da2990f1C1 (1000 ETH)
+(9) 0xd3e25c067045cCD84e8E025E88fAfaf3A0b9D514 (1000 ETH)
+
+Private Keys
+==================
+(0) 0x687edd51035620b9e69ef94b4a70e062dd32259411628175a1f24be7d33b4389
+(1) 0xd15803e5f5d6ac6fbcc7ef8be7e42b3bb6e541658fcb73f96a43fe3e9bc80c7c
+(2) 0xc7a32c1ed4cd6f8c44b859762da30c1f500c2f8d99a276505d27670e199ce5ed
+(3) 0xf2187366c200d0fcfcc4f1ecc0c0c129f1cbefc47ccb74a3e05e0ad6860077ad
+(4) 0xfb3f5152f479d5e4ec18216439034d3aa92c394807a1c4fe13bc85ce08531c2f
+(5) 0xbbbd07ae3f4bbf240880bca4564de1f67c6fb7dc3a453bdd047a696d436160dc
+(6) 0x6aa48ff8330b73bcd6eefde27cd1c9c3219c945dfaaa65aeb186124474c34a30
+(7) 0x19c24197b51482771903bd53e3153b9ab582bed2b5380235ff5c46b8af356a81
+(8) 0x0b758f7e8105005fd346699ba418c82e8f284ca294b02d4ca235bdcf4f17b1dc
+(9) 0x982baa3d200cb8c56a80f889500787d401122202ccaf36e55575401df616b226
+
+HD Wallet
+==================
+Mnemonic:      flee stove universe enforce kite joke under category lizard setup fox jar
+Base HD Path:  m/44'/60'/0'/0/{account_index}
+
+Default Gas Price
+==================
+2000000000
+
+BlockGas Limit
+==================
+30000000
+
+Call Gas Limit
+==================
+50000000
+
+Chain
+==================
+Hardfork: shanghai
+Id:       1337
+
+RPC Listening on 127.0.0.1:8545
+eth_getBlockByNumber
+eth_chainId
+eth_chainId
+eth_estimateGas
+eth_blockNumber
+eth_getBlockByNumber
+eth_sendTransaction
+
+  Transaction: 0x7d7ec02017e0a9b94c125e5efbeb0e6195d30ccf379d150ef57af9d9e6a58fcd
+  Contract created: 0x83e60416035f522444c7be67da77a6347e453fe5
+  Gas usage: 2180607
+  Block number: 1
+  Block time: Sun Jun 02 2024 20:57:31 GMT+0800 (中国标准时间)
+
+eth_getTransactionReceipt
+
+Received shutdown signal: SIGHUP
+Shutting down…
+Server has been shut down
+^C
