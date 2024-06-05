@@ -4,6 +4,9 @@ import json
 import os
 from web3 import Web3
 from flask import Flask, request, jsonify
+
+from web3src.generate_vc import generate_vc
+
 app = Flask(__name__)
 
 w3 = None
@@ -11,6 +14,7 @@ abi = None
 bytecode = None
 account_addr = ''
 contract_addr = ''
+
 
 def deploy():
     global w3, account_addr
@@ -24,6 +28,8 @@ def deploy():
     with open(c_path, 'w') as bytecode_file:
         bytecode_file.write(contract_addr)
     return contract_addr
+
+
 def check_file(file_path):
     try:
         with open(file_path, 'r') as file:
@@ -37,6 +43,8 @@ def check_file(file_path):
     except FileNotFoundError:
         print(f"file {file_path} not found")
         return False
+
+
 def init_func():
     global w3, abi, bytecode, account_addr, contract_addr
     # 连接到以太坊节点 (这里以本地节点为例)
@@ -61,7 +69,10 @@ def init_func():
     if chk_file:
         contract_addr = chk_file
     else:
-        contract_addr= deploy()
+        contract_addr = deploy()
+
+    from sqlite import init_sqlite
+    init_sqlite()
 
 
 # 和持有者交互 - 注册
@@ -81,6 +92,7 @@ def register():
     # 返回
     return jsonify({"message": "Registration Successful"}), 200
 
+
 # 和持有者交互 - 登录
 @app.route('/login', methods=['POST'])
 def login():
@@ -95,7 +107,7 @@ def login():
     conn = sqlite3.connect('accounts.db')
     cursor = conn.cursor()
     cursor.execute('''
-           SELECT private_key, addr, did FROM Holder WHERE account = ? AND password = ?
+           SELECT addr, addr FROM Holder WHERE account = ? AND password = ?
        ''', (account, hashlib.sha256(password.encode()).hexdigest()))
     result = cursor.fetchone()
     conn.close()
@@ -106,12 +118,13 @@ def login():
     else:
         return jsonify({'message': 'Invalid credentials'}), 401
 
+
 @app.route('/registerDID', methods=['POST'])
 def registerDID():
     global contract_addr
     # data = request.json
     # type_of_key = data.get('type_of_key') # 一个list，每项用来选择SM2 or RSA
-    type_of_key = ['SM2']
+    type_of_key = ['RSA']
     public_key_pem = []
     private_key_pem = []
     from web3src.generate_key import generate_keys
@@ -121,7 +134,8 @@ def registerDID():
         private_key_pem.append(sk)
     from web3src.interact_with_contract import register_did
     try:
-        did_document = register_did(w3, abi, account_addr, contract_addr, public_key_pem, type_of_key, private_key_pem[0])
+        did_document = register_did(w3, abi, account_addr, contract_addr, public_key_pem, type_of_key,
+                                    private_key_pem[0])
     except Exception as e:
         print("register_did failed")
     else:
@@ -129,6 +143,27 @@ def registerDID():
         print(did_document)
         # 这里返回给前端一个did_document，然后数据库就找里面对应的字段就可以，[公私钥对就是前面的两个list，记得加一个type_of_key]，
         # 然后还得再存一份did_document完整的
+        # 将 did_document 转换为 JSON 字符串
+        json.dumps(did_document)
+
+        conn = sqlite3.connect('accounts.db')
+        cursor = conn.cursor()
+        did = did_document["id"]
+
+        # 使用zip将它们组合在一起
+        data = zip(did, type_of_key, public_key_pem, private_key_pem)
+
+        # 遍历组合后的数据并插入到数据库中
+        for entry in data:
+            cursor.execute('''
+                INSERT INTO key (DID, type_of_key, public_key_pem, private_key_pem)
+                VALUES (?, ?, ?, ?)
+            ''', entry)
+
+        conn.commit()
+        conn.close()
+
+        # return jsonify({'did_document': did_document}), 201
 
 
 # 和颁发者交互
@@ -159,7 +194,8 @@ def verifyDID():
     lld = verify_did(w3, abi, contract_addr, data)
     print("================VERIFY_DID=============")
     print(lld)
-    return lld # 返回给前端login函数那样的jsonfy信息
+    return lld  # 返回给前端login函数那样的jsonfy信息
+
 
 @app.route('/generateVC', methods=['POST'])
 def generateVC():
@@ -167,17 +203,44 @@ def generateVC():
     # credential_subject = data.get('credential_subject') # 声明
     # vc_type = data.get('vc_type') # VC类型
     # kid = data.get('kid') # 采用第几个公私钥对进行签名
+
+    # private_key_pem = '-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCOU0dxNFY/+BtR\nGxN+lYZ+HGD8oN3XvkC2we/CffHJeY2GLAOxSY+f7anc8m9P3//jX0NN2h9Nc1p4\nzBXNt9sitDjnPtaBaMA7iyiDc/Q9gMxkaNWeCKdXkyC34zVM8NUBNWLpjF6feWc7\nwBgIEphHZGemQYTc5NOOTe++iEiqm1Et8cjbydNAkEn9/i/uqvil1A+TE8OxaCC2\nyNQrov2Gdix2d5+xiInwcfbbX7y8quTUxBw/J8D8Vx/QmGya8aj2lGxlUflXZEul\nZ5NplbWIMfohCygb/pmSSUAkrMH9CjuPO6tDK8jJ8//LpxEHsdbEXvQdIgwjBLQB\nXLiFEh+XAgMBAAECggEADWUZHDZox6x6Ja/+rbM07TmOhzg8qMlnHcwy3IMt9mBS\nSYZq8oyRz+N2US0f/MyAMM4Ob41P1OI+aZALnUjofuOnV1w6pANP1ErMjVKkcgVl\nNy4GrNDzrvJR6fygT5V69ponrQNhBHFQnfb+TAQ0AMQaXTNdZczDfGkpXy1EaYoA\nrXtSP2YXaIPSmke6IheP062Qmy7EowlLDVjkHp+QqQA9pcVQC6NYy/7bsGsVr5IX\nGzxskBwfMjuwlnJn16kadmEJHLUYRfHuzegiNx0CE9az/HwaxYyaN9SNHmt8oKSe\nmOKaobTEOOy+0ctdblEqVvC5sH05uHRDNqxGdY/uwQKBgQDGIRzI7chXNqQagfk9\nGbkFVCwnu242rIu9Bl86qEauoJbJAmZTdqR0nOJwY4/U6rJY28ij6vdpY75ziinq\ndlIK4EeGoEZofoj3WTqLgbDv+4Gi12obwoXWvzGK7JtEKunuUMfO6ZpSMuNZEeRp\nGGOh6pw2jafdOlhxSUeslV6jNQKBgQC35XxbdXZpK6f9F/rN5nkCdUrB9Y5Q2HQ1\nl62bMYbWrWOYVGa4xDaThwpkTF3DhJ2frHeo8zSv/GtmIHSOV7fEn/NE02WsR6pS\npN+pToZsh1gGzXGZEHMgRlw75wa9Zn6hr0uJ03NVe3dC1+KQSld56Og8BBErBU/N\nY28lwkdlGwKBgB3OL2letAvCsY83TEpPy1Cs5/OWM69P57mo8rx9QhzVFbnpfYFC\n0NymGT51C9co82mArr9SAqQ9GBKDj2ixIgh20uvCwrTHjE1BhBgmi3qeqFLZ+yFv\n8vhqTMasb3MizYxHZLeQ1uFUvHTSxzy0KZDbHWLrjnwuYc2xC3JACjudAoGBAK3q\nXr2wTRgRrYHy18M6oF7uxpDAxqM20lCM7ibDpB4LRRGfYLaE+ohzQiSxBEwQc3G7\nDj++Iqn9MyUWtKSZ2LYf/1WsB4/zBuW5/7yDAyZIqbtlOHXl1LtFT51nVDxzXndS\n7UGftIe3iIay3RZQ+IHW/ysjPYlOMLaxv0AaiKLZAoGARXlf770aqdV2N0cTJVuH\nnf+0iYpIqkpELoNv7FrvA0epP5ZcBDb0BWONurzcRxVEkGBidA5jwT11C/hdsZhW\nRp+hzl+Lyz5uaCi9YyZC3PZypoGOJhWKKaq9dgAaWzpdrFzhL9zwOc1Xd9KHz6Jd\nCtTfwG+7YXw4Bb+TxN4N1A8=\n-----END PRIVATE KEY-----\n'
+    # signature_algorithm = 'RSA' # 从数据库拿
     kid = '1'
-    issuer = 'did' #从数据库拿自己的did
+    kid_int = int(ord(kid) - ord('0'))
+    conn = sqlite3.connect('accounts.db')
+    cursor = conn.cursor()
+
+
+    # 获取issuer
+    cursor.execute('SELECT DID FROM key WHERE id = 1')
+    issuer_tuple = cursor.fetchone()
+    issuer = issuer_tuple[0]
+
     key_id = issuer + '#key-' + kid
     credential_subject = 'I can play football'
     vc_type = 'AlumniCredential'
-    private_key_pem = '-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCOU0dxNFY/+BtR\nGxN+lYZ+HGD8oN3XvkC2we/CffHJeY2GLAOxSY+f7anc8m9P3//jX0NN2h9Nc1p4\nzBXNt9sitDjnPtaBaMA7iyiDc/Q9gMxkaNWeCKdXkyC34zVM8NUBNWLpjF6feWc7\nwBgIEphHZGemQYTc5NOOTe++iEiqm1Et8cjbydNAkEn9/i/uqvil1A+TE8OxaCC2\nyNQrov2Gdix2d5+xiInwcfbbX7y8quTUxBw/J8D8Vx/QmGya8aj2lGxlUflXZEul\nZ5NplbWIMfohCygb/pmSSUAkrMH9CjuPO6tDK8jJ8//LpxEHsdbEXvQdIgwjBLQB\nXLiFEh+XAgMBAAECggEADWUZHDZox6x6Ja/+rbM07TmOhzg8qMlnHcwy3IMt9mBS\nSYZq8oyRz+N2US0f/MyAMM4Ob41P1OI+aZALnUjofuOnV1w6pANP1ErMjVKkcgVl\nNy4GrNDzrvJR6fygT5V69ponrQNhBHFQnfb+TAQ0AMQaXTNdZczDfGkpXy1EaYoA\nrXtSP2YXaIPSmke6IheP062Qmy7EowlLDVjkHp+QqQA9pcVQC6NYy/7bsGsVr5IX\nGzxskBwfMjuwlnJn16kadmEJHLUYRfHuzegiNx0CE9az/HwaxYyaN9SNHmt8oKSe\nmOKaobTEOOy+0ctdblEqVvC5sH05uHRDNqxGdY/uwQKBgQDGIRzI7chXNqQagfk9\nGbkFVCwnu242rIu9Bl86qEauoJbJAmZTdqR0nOJwY4/U6rJY28ij6vdpY75ziinq\ndlIK4EeGoEZofoj3WTqLgbDv+4Gi12obwoXWvzGK7JtEKunuUMfO6ZpSMuNZEeRp\nGGOh6pw2jafdOlhxSUeslV6jNQKBgQC35XxbdXZpK6f9F/rN5nkCdUrB9Y5Q2HQ1\nl62bMYbWrWOYVGa4xDaThwpkTF3DhJ2frHeo8zSv/GtmIHSOV7fEn/NE02WsR6pS\npN+pToZsh1gGzXGZEHMgRlw75wa9Zn6hr0uJ03NVe3dC1+KQSld56Og8BBErBU/N\nY28lwkdlGwKBgB3OL2letAvCsY83TEpPy1Cs5/OWM69P57mo8rx9QhzVFbnpfYFC\n0NymGT51C9co82mArr9SAqQ9GBKDj2ixIgh20uvCwrTHjE1BhBgmi3qeqFLZ+yFv\n8vhqTMasb3MizYxHZLeQ1uFUvHTSxzy0KZDbHWLrjnwuYc2xC3JACjudAoGBAK3q\nXr2wTRgRrYHy18M6oF7uxpDAxqM20lCM7ibDpB4LRRGfYLaE+ohzQiSxBEwQc3G7\nDj++Iqn9MyUWtKSZ2LYf/1WsB4/zBuW5/7yDAyZIqbtlOHXl1LtFT51nVDxzXndS\n7UGftIe3iIay3RZQ+IHW/ysjPYlOMLaxv0AaiKLZAoGARXlf770aqdV2N0cTJVuH\nnf+0iYpIqkpELoNv7FrvA0epP5ZcBDb0BWONurzcRxVEkGBidA5jwT11C/hdsZhW\nRp+hzl+Lyz5uaCi9YyZC3PZypoGOJhWKKaq9dgAaWzpdrFzhL9zwOc1Xd9KHz6Jd\nCtTfwG+7YXw4Bb+TxN4N1A8=\n-----END PRIVATE KEY-----\n'
-    signature_algorithm = 'RSA' # 从数据库拿
-    from web3src.generate_vc import generate_vc
+
+    cursor.execute('SELECT private_key_pem FROM key WHERE id = ?', (kid_int,))
+    private_key_pem_tuple = cursor.fetchone()
+    private_key_pem = private_key_pem_tuple[0]  # 提取元组中的第一个元素
+
+    cursor.execute('SELECT type_of_key FROM key WHERE id = ?', (kid_int,))
+    signature_algorithm_tuple = cursor.fetchone()
+    signature_algorithm = signature_algorithm_tuple[0]  # 提取元组中的第一个元素
+
     vc = generate_vc(vc_type, issuer, credential_subject, key_id, private_key_pem, signature_algorithm)
     print("===================VC========================")
-    print(vc) # 返回一个vc，显示到前端，然后放在数据库
+    print(vc)  # 返回一个vc，显示到前端，然后放在数据库
+
+    vc_id = vc["id"]
+    vc_string = json.dumps(vc)
+    cursor.execute('''
+                    INSERT INTO VC (VCID, VC_document) 
+                    VALUES (?, ?)
+                ''', (vc_id, vc_string))
+    conn.commit()
+    conn.close()
 
 
 # 和验证者交互 - 验证VC
@@ -208,7 +271,8 @@ def verifyVC():
     lld = verify_vc(w3, abi, contract_addr, data)
     print("===============VERIFY_VC================")
     print(lld)
-    return lld # 返回jsonfy信息
+    return lld  # 返回jsonfy信息
+
 
 @app.route('/generateVP', methods=['POST'])
 def generateVP():
@@ -236,15 +300,26 @@ def generateVP():
     data = json.loads(json_string)
     verifiableCredential = [data]
     kid = '1'
-    did = 'did:example:ebfeb1f712ebc6f1c276e12ec21' #从数据库拿
+    kid_int = int(ord(kid) - ord('0'))
+    conn = sqlite3.connect('accounts.db')
+    cursor = conn.cursor()
+
+    cursor.execute('SELECT DID FROM key WHERE id = ?',(kid_int,))
+    did = cursor.fetchone()[0]
+
     key_id = did + '#key-' + kid
     vp_type = 'VerifiablePresentation'
-    private_key_pem = '-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCOU0dxNFY/+BtR\nGxN+lYZ+HGD8oN3XvkC2we/CffHJeY2GLAOxSY+f7anc8m9P3//jX0NN2h9Nc1p4\nzBXNt9sitDjnPtaBaMA7iyiDc/Q9gMxkaNWeCKdXkyC34zVM8NUBNWLpjF6feWc7\nwBgIEphHZGemQYTc5NOOTe++iEiqm1Et8cjbydNAkEn9/i/uqvil1A+TE8OxaCC2\nyNQrov2Gdix2d5+xiInwcfbbX7y8quTUxBw/J8D8Vx/QmGya8aj2lGxlUflXZEul\nZ5NplbWIMfohCygb/pmSSUAkrMH9CjuPO6tDK8jJ8//LpxEHsdbEXvQdIgwjBLQB\nXLiFEh+XAgMBAAECggEADWUZHDZox6x6Ja/+rbM07TmOhzg8qMlnHcwy3IMt9mBS\nSYZq8oyRz+N2US0f/MyAMM4Ob41P1OI+aZALnUjofuOnV1w6pANP1ErMjVKkcgVl\nNy4GrNDzrvJR6fygT5V69ponrQNhBHFQnfb+TAQ0AMQaXTNdZczDfGkpXy1EaYoA\nrXtSP2YXaIPSmke6IheP062Qmy7EowlLDVjkHp+QqQA9pcVQC6NYy/7bsGsVr5IX\nGzxskBwfMjuwlnJn16kadmEJHLUYRfHuzegiNx0CE9az/HwaxYyaN9SNHmt8oKSe\nmOKaobTEOOy+0ctdblEqVvC5sH05uHRDNqxGdY/uwQKBgQDGIRzI7chXNqQagfk9\nGbkFVCwnu242rIu9Bl86qEauoJbJAmZTdqR0nOJwY4/U6rJY28ij6vdpY75ziinq\ndlIK4EeGoEZofoj3WTqLgbDv+4Gi12obwoXWvzGK7JtEKunuUMfO6ZpSMuNZEeRp\nGGOh6pw2jafdOlhxSUeslV6jNQKBgQC35XxbdXZpK6f9F/rN5nkCdUrB9Y5Q2HQ1\nl62bMYbWrWOYVGa4xDaThwpkTF3DhJ2frHeo8zSv/GtmIHSOV7fEn/NE02WsR6pS\npN+pToZsh1gGzXGZEHMgRlw75wa9Zn6hr0uJ03NVe3dC1+KQSld56Og8BBErBU/N\nY28lwkdlGwKBgB3OL2letAvCsY83TEpPy1Cs5/OWM69P57mo8rx9QhzVFbnpfYFC\n0NymGT51C9co82mArr9SAqQ9GBKDj2ixIgh20uvCwrTHjE1BhBgmi3qeqFLZ+yFv\n8vhqTMasb3MizYxHZLeQ1uFUvHTSxzy0KZDbHWLrjnwuYc2xC3JACjudAoGBAK3q\nXr2wTRgRrYHy18M6oF7uxpDAxqM20lCM7ibDpB4LRRGfYLaE+ohzQiSxBEwQc3G7\nDj++Iqn9MyUWtKSZ2LYf/1WsB4/zBuW5/7yDAyZIqbtlOHXl1LtFT51nVDxzXndS\n7UGftIe3iIay3RZQ+IHW/ysjPYlOMLaxv0AaiKLZAoGARXlf770aqdV2N0cTJVuH\nnf+0iYpIqkpELoNv7FrvA0epP5ZcBDb0BWONurzcRxVEkGBidA5jwT11C/hdsZhW\nRp+hzl+Lyz5uaCi9YyZC3PZypoGOJhWKKaq9dgAaWzpdrFzhL9zwOc1Xd9KHz6Jd\nCtTfwG+7YXw4Bb+TxN4N1A8=\n-----END PRIVATE KEY-----\n'
-    signature_algorithm = 'RSA' # 从数据库拿
+    # private_key_pem = '-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCOU0dxNFY/+BtR\nGxN+lYZ+HGD8oN3XvkC2we/CffHJeY2GLAOxSY+f7anc8m9P3//jX0NN2h9Nc1p4\nzBXNt9sitDjnPtaBaMA7iyiDc/Q9gMxkaNWeCKdXkyC34zVM8NUBNWLpjF6feWc7\nwBgIEphHZGemQYTc5NOOTe++iEiqm1Et8cjbydNAkEn9/i/uqvil1A+TE8OxaCC2\nyNQrov2Gdix2d5+xiInwcfbbX7y8quTUxBw/J8D8Vx/QmGya8aj2lGxlUflXZEul\nZ5NplbWIMfohCygb/pmSSUAkrMH9CjuPO6tDK8jJ8//LpxEHsdbEXvQdIgwjBLQB\nXLiFEh+XAgMBAAECggEADWUZHDZox6x6Ja/+rbM07TmOhzg8qMlnHcwy3IMt9mBS\nSYZq8oyRz+N2US0f/MyAMM4Ob41P1OI+aZALnUjofuOnV1w6pANP1ErMjVKkcgVl\nNy4GrNDzrvJR6fygT5V69ponrQNhBHFQnfb+TAQ0AMQaXTNdZczDfGkpXy1EaYoA\nrXtSP2YXaIPSmke6IheP062Qmy7EowlLDVjkHp+QqQA9pcVQC6NYy/7bsGsVr5IX\nGzxskBwfMjuwlnJn16kadmEJHLUYRfHuzegiNx0CE9az/HwaxYyaN9SNHmt8oKSe\nmOKaobTEOOy+0ctdblEqVvC5sH05uHRDNqxGdY/uwQKBgQDGIRzI7chXNqQagfk9\nGbkFVCwnu242rIu9Bl86qEauoJbJAmZTdqR0nOJwY4/U6rJY28ij6vdpY75ziinq\ndlIK4EeGoEZofoj3WTqLgbDv+4Gi12obwoXWvzGK7JtEKunuUMfO6ZpSMuNZEeRp\nGGOh6pw2jafdOlhxSUeslV6jNQKBgQC35XxbdXZpK6f9F/rN5nkCdUrB9Y5Q2HQ1\nl62bMYbWrWOYVGa4xDaThwpkTF3DhJ2frHeo8zSv/GtmIHSOV7fEn/NE02WsR6pS\npN+pToZsh1gGzXGZEHMgRlw75wa9Zn6hr0uJ03NVe3dC1+KQSld56Og8BBErBU/N\nY28lwkdlGwKBgB3OL2letAvCsY83TEpPy1Cs5/OWM69P57mo8rx9QhzVFbnpfYFC\n0NymGT51C9co82mArr9SAqQ9GBKDj2ixIgh20uvCwrTHjE1BhBgmi3qeqFLZ+yFv\n8vhqTMasb3MizYxHZLeQ1uFUvHTSxzy0KZDbHWLrjnwuYc2xC3JACjudAoGBAK3q\nXr2wTRgRrYHy18M6oF7uxpDAxqM20lCM7ibDpB4LRRGfYLaE+ohzQiSxBEwQc3G7\nDj++Iqn9MyUWtKSZ2LYf/1WsB4/zBuW5/7yDAyZIqbtlOHXl1LtFT51nVDxzXndS\n7UGftIe3iIay3RZQ+IHW/ysjPYlOMLaxv0AaiKLZAoGARXlf770aqdV2N0cTJVuH\nnf+0iYpIqkpELoNv7FrvA0epP5ZcBDb0BWONurzcRxVEkGBidA5jwT11C/hdsZhW\nRp+hzl+Lyz5uaCi9YyZC3PZypoGOJhWKKaq9dgAaWzpdrFzhL9zwOc1Xd9KHz6Jd\nCtTfwG+7YXw4Bb+TxN4N1A8=\n-----END PRIVATE KEY-----\n'
+    # signature_algorithm = 'RSA' # 从数据库拿
+    cursor.execute('SELECT private_key_pem from key WHERE id = ?', (kid_int,))
+    private_key_pem = cursor.fetchone()[0]
+    cursor.execute('select type_of_key from key WHERE id = ?', (kid_int,))
+    signature_algorithm = cursor.fetchone()[0]
+
     from web3src.generate_vp import generate_vp
     vp = generate_vp(vp_type, verifiableCredential, private_key_pem, signature_algorithm, key_id)
     print("====================VP=======================")
-    print(vp) # 返回一个vc，显示到前端，然后放在数据库
+    print(vp)
 
 
 # 和验证者交互 - 验证VP
@@ -288,7 +363,8 @@ def verifyVP():
     lld = verify_vp(w3, abi, contract_addr, data)
     print("===================VERIFY_VP================")
     print(lld)
-    return lld # 返回jsonfy
+    return lld  # 返回jsonfy
+
 
 if __name__ == '__main__':
     init_func()

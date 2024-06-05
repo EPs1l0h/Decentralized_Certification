@@ -46,8 +46,8 @@ def verify_did(w3, abi, contract_address, did_document): # 输入addr
         return {"msg":"Verification successful"}
     except InvalidSignature:
         # print(False, "Invalid signature")
-        # return {"msg":"Invalid signature"}
-        return {"msg": "Verification successful"}
+        return {"msg":"Invalid signature"}
+        # return {"msg": "Verification successful"}
     
 
 # # test case
