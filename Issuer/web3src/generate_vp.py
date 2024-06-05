@@ -47,7 +47,7 @@ def generate_vp(type, verifiable_credential, private_key_pem, signature_algorith
     }
 
     # 对 VP 进行签名
-    vp_data = json.dumps(vp, separators=(',', ':')).encode()
+    vp_data = json.dumps(vp).encode()
     proofValue = sign_json(vp_data, private_key_pem, signature_algorithm)
 
     # 构建 proof 对象

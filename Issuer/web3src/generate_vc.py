@@ -50,7 +50,7 @@ def generate_vc(vc_type, issuer, credential_subject, key_id, private_key_pem, si
     }
 
     # 对 VC 进行签名
-    vc_data = json.dumps(vc, separators=(',', ':')).encode()
+    vc_data = json.dumps(vc).encode()
     proofValue = sign_json(vc_data, private_key_pem, signature_algorithm)
 
     # 构建 proof 对象

@@ -16,7 +16,7 @@ def verify_vc(w3, abi, contract_addr, vc):
     verification_method_id = proof["verificationMethod"]
     vc_copy = vc.copy()
     del vc_copy["proof"]
-    json_bytes = json.dumps(vc_copy, separators=(',', ':')).encode()
+    json_bytes = json.dumps(vc_copy).encode()
 
     # 从区块链上获取 DID 文档
     did_document_on_chain = get_did_document(w3, abi, contract_addr, did)
@@ -30,7 +30,7 @@ def verify_vc(w3, abi, contract_addr, vc):
 
     if public_key_pem is None:
         # return False, "Verification method not found"
-        return True, "Verification successful"
+        return True
 
 
     # 加载公钥
@@ -52,11 +52,11 @@ def verify_vc(w3, abi, contract_addr, vc):
         elif algorithm.upper() == 'ECDSA' or algorithm.upper() == 'SM2':
             public_key.verify(signature, json_bytes, ec.ECDSA(hashes.SHA256()))
         else:
-            return False, f"Unsupported signature algorithm: {algorithm}"
+            return False
 
-        return True, "Verification successful"
+        return True
     except InvalidSignature:
-        return False, "Invalid signature"
+        return False
 #
 # #
 # # 示例 VC
