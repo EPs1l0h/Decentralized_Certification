@@ -7,6 +7,7 @@ import RegisterView from "@/views/RegisterView.vue";
 import ACCESS_ENUM from "@/access/accessEnum"; // 引入 ACCESS_ENUM
 import SimpleLayout from "@/layouts/SimpleLayout.vue";
 import HolderView from "@/views/HolderView.vue";
+import IssuerView from "@/views/IssuerView.vue";
 
 export const routes: Array<RouteRecordRaw> = [
   {
@@ -27,15 +28,20 @@ export const routes: Array<RouteRecordRaw> = [
     },
   },
   {
+    path: "/issue",
+    name: "颁发者颁发证书",
+    component: IssuerView,
+  },
+  {
     path: "/verification",
     name: "验证者验证证书",
     component: VerifyView,
   },
-  // {
-  //   path: "/blockInfo",
-  //   name: "当前区块链信息",
-  //   component: BlockInfoView,
-  // },
+  {
+    path: "/blockInfo",
+    name: "当前区块链信息",
+    component: BlockInfoView,
+  },
   {
     path: "/login",
     name: "登录",

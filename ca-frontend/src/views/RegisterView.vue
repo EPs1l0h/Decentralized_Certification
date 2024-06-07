@@ -1,3 +1,4 @@
+<!--/src/views/RegisterView.vue-->
 <template>
   <div class="register-container">
     <el-card class="register-card">
@@ -51,7 +52,7 @@
 import { reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import { FormInstance, FormRules } from "element-plus";
-import axios from "axios";
+import api from "@/config/api";
 
 const router = useRouter();
 
@@ -59,7 +60,6 @@ const registerForm = reactive({
   username: "",
   password: "",
   confirmPassword: "",
-  algorithm: "",
 });
 
 const registerRules = reactive<FormRules>({
@@ -78,7 +78,6 @@ const registerRules = reactive<FormRules>({
       trigger: "blur",
     },
   ],
-  algorithm: [{ required: true, message: "请选择签名算法", trigger: "change" }],
 });
 
 const registerFormRef = ref<FormInstance>();
@@ -88,16 +87,18 @@ const handleRegister = async () => {
   await registerFormRef.value.validate(async (valid) => {
     if (valid) {
       try {
-        const response = await axios.post(
-          "http://localhost:8000/register_post",
-          {
-            name: registerForm.username,
+        const response = await fetch(api.register, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
             password: registerForm.password,
-            alg: registerForm.algorithm,
-          }
-        );
-        const { isValid } = response.data;
-        if (isValid) {
+            password_confirm: registerForm.confirmPassword,
+          }),
+        });
+
+        if (response.ok) {
           router.push("/login");
         } else {
           console.error("Registration failed.");

@@ -107,13 +107,10 @@
 import { ref, onMounted } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { Bell, UserFilled } from "@element-plus/icons-vue";
-import {
-  vcList as mockVCList,
-  vpRequestList as mockVPRequestList,
-} from "@/mock";
+import api from "@/config/api"; // 引入全局配置文件
 
-const vcList = ref(mockVCList);
-const vpRequestList = ref(mockVPRequestList);
+const vcList = ref([]);
+const vpRequestList = ref([]);
 
 const holderInfo = ref({
   userName: "",
@@ -135,15 +132,58 @@ const applyVCForm = ref({
 
 onMounted(async () => {
   await getHolderInfo();
+  await getVCList();
+  await getVPRequestList();
 });
 
 const getHolderInfo = async () => {
-  // 模拟从后端获取持有者信息
-  const mockHolderInfo = {
-    userName: "张三",
-    did: "did:example:123456789abcdefghi",
-  };
-  holderInfo.value = mockHolderInfo;
+  try {
+    const response = await fetch(api.getHolderInfo);
+    const data = await response.json();
+    if (data.isValid) {
+      holderInfo.value = {
+        userName: data.username,
+        did: data.DID,
+      };
+    } else {
+      ElMessage.error("获取持有者信息失败");
+    }
+  } catch (error) {
+    console.error("获取持有者信息失败:", error);
+    ElMessage.error("获取持有者信息失败");
+  }
+};
+
+const getVCList = async () => {
+  try {
+    const response = await fetch(api.holderRequestVC);
+    const data = await response.json();
+    if (data.isValid) {
+      vcList.value = data.VC;
+    } else {
+      ElMessage.error("获取VC列表失败");
+    }
+  } catch (error) {
+    console.error("获取VC列表失败:", error);
+    ElMessage.error("获取VC列表失败");
+  }
+};
+
+const getVPRequestList = async () => {
+  try {
+    const response = await fetch(api.getBeAskedVPList, {
+      method: "POST",
+    });
+    const data = await response.json();
+    if (data.isValid) {
+      vpRequestList.value = data.VC;
+    } else {
+      ElMessage.error("获取VP请求列表失败");
+    }
+  } catch (error) {
+    console.error("获取VP请求列表失败:", error);
+    ElMessage.error("获取VP请求列表失败");
+  }
 };
 
 const openApplyVCDialog = () => {
@@ -158,22 +198,58 @@ const resetApplyVCForm = () => {
 };
 
 const applyVC = async () => {
-  // 模拟调用后端API
-  ElMessage.success("请求已发送，等待颁发者通过");
-  applyVCDialogVisible.value = false;
-  resetApplyVCForm();
+  try {
+    const response = await fetch(api.requestAuthenticateDID, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(applyVCForm.value),
+    });
+    const data = await response.json();
+    if (data.isValid) {
+      ElMessage.success("请求已发送，等待颁发者通过");
+      applyVCDialogVisible.value = false;
+      resetApplyVCForm();
+    } else {
+      ElMessage.error("申请VC失败");
+    }
+  } catch (error) {
+    console.error("申请VC失败:", error);
+    ElMessage.error("申请VC失败");
+  }
 };
 
 const handleVPRequest = async (request) => {
-  // 模拟处理VP请求
-  await ElMessageBox.confirm(`是否同意 ${request.verifier} 的VP请求?`, "提示", {
-    type: "warning",
-  });
-  ElMessage.success("已同意VP请求!");
-  // 从VP请求列表中移除处理完的请求
-  vpRequestList.value = vpRequestList.value.filter(
-    (item) => item.id !== request.id
-  );
+  try {
+    await ElMessageBox.confirm(
+      `是否同意 ${request.verifier} 的VP请求?`,
+      "提示",
+      {
+        type: "warning",
+      }
+    );
+    const response = await fetch(api.holderToVerifier, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username: request.verifier }),
+    });
+    const data = await response.json();
+    if (data.isValid) {
+      ElMessage.success("已同意VP请求!");
+      // 从VP请求列表中移除处理完的请求
+      vpRequestList.value = vpRequestList.value.filter(
+        (item) => item.id !== request.id
+      );
+    } else {
+      ElMessage.error("处理VP请求失败");
+    }
+  } catch (error) {
+    console.error("处理VP请求失败:", error);
+    ElMessage.error("处理VP请求失败");
+  }
 };
 </script>
 

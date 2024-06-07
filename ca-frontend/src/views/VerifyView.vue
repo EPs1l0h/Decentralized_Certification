@@ -127,6 +127,7 @@
 <script setup lang="ts">
 import { ref, reactive } from "vue";
 import { Promotion, Stamp } from "@element-plus/icons-vue";
+import api from "@/config/api"; // 导入全局的 API 配置
 
 const requestForm = reactive({
   holderName: "",
@@ -155,58 +156,85 @@ interface VerifyResult {
 
 const verifyResult = ref<VerifyResult | null>(null);
 
-const mockVCVP: VCVP = {
-  type: "AlumniCredential",
-  credentialSubject: {
-    id: "did:example:ebfeb1f712ebc6f1c276e12ec21",
-    alumniOf: {
-      id: "did:example:c276e12ec21ebfeb1f712ebc6f1",
-      name: "Example University",
-    },
-  },
-  issuer: "https://example.edu/issuers/565049",
-  issuanceDate: "2010-01-01T19:73:24Z",
-};
-
 const handleRequest = async () => {
   requesting.value = true;
   requestForm.holderName = input_name.value;
-  // 模拟请求延迟
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  step.value = 1;
-  // 模拟持有者提交证书延迟
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  vcvp.value = mockVCVP;
-  step.value = 2;
+
+  try {
+    // 发起验证请求
+    await fetch(api.askHolder, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ verify_username: input_name.value }),
+    });
+
+    step.value = 1;
+
+    // 轮询获取VP
+    const pollVP = async () => {
+      const response = await fetch(api.checkVP, {
+        method: "POST",
+      });
+      const data = await response.json();
+
+      if (data.vp) {
+        vcvp.value = data.vp;
+        step.value = 2;
+      } else {
+        setTimeout(pollVP, 1000); // 如果没有获取到VP，则1秒后重新轮询
+      }
+    };
+
+    await pollVP();
+  } catch (error) {
+    console.error("请求错误:", error);
+  }
+
   requesting.value = false;
 };
 
 const handleVerify = async () => {
   verifying.value = true;
-  // 模拟验证延迟
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  // 模拟随机验证结果
-  const isValid = Math.random() < 0.5;
-  if (isValid) {
-    verifyResult.value = {
-      title: "验证成功",
-      type: "success",
-      message: "VC/VP验证成功,该证书真实有效。",
-    };
-  } else {
+
+  try {
+    // 验证VP
+    const response = await fetch(api.verifyVP, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ vp: vcvp.value }),
+    });
+    const data = await response.json();
+
+    if (data.msg) {
+      verifyResult.value = {
+        title: "验证成功",
+        type: "success",
+        message: data.msg,
+      };
+    } else {
+      verifyResult.value = {
+        title: "验证失败",
+        type: "error",
+        message: "VC/VP验证失败,该证书无效。",
+      };
+    }
+  } catch (error) {
+    console.error("验证错误:", error);
     verifyResult.value = {
       title: "验证失败",
       type: "error",
-      message: "VC/VP验证失败,该证书无效。",
+      message: "验证过程中发生错误。",
     };
   }
-  verifying.value = false;
 
-  // 将步骤设为3
+  verifying.value = false;
   step.value = 3;
 };
 </script>
-
 <style scoped>
 .verify-view {
   padding: 2rem;

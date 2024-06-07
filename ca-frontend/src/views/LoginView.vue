@@ -1,3 +1,4 @@
+<!--/src/views/LoginView.vue-->
 <template>
   <div class="login-container">
     <el-card class="login-card">
@@ -33,7 +34,7 @@ import { reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 import { FormInstance, FormRules } from "element-plus";
-import axios from "axios";
+import api from "@/config/api";
 
 const router = useRouter();
 const store = useStore();
@@ -43,8 +44,6 @@ const loginForm = reactive({
   password: "",
 });
 
-const _username = ref("");
-const _password = ref("");
 const loginRules = reactive<FormRules>({
   username: [{ required: true, message: "请输入用户名", trigger: "blur" }],
   password: [{ required: true, message: "请输入密码", trigger: "blur" }],
@@ -53,40 +52,34 @@ const loginRules = reactive<FormRules>({
 const loginFormRef = ref<FormInstance>();
 
 const handleLogin = async () => {
-  loginForm.username = _username.value;
-  loginForm.password = _password.value;
-  console.log("loginForm:", loginForm);
-  console.log("loginFormRef:", loginFormRef.value);
-
   if (!loginFormRef.value) return;
   await loginFormRef.value.validate(async (valid) => {
     if (valid) {
-      // 模拟登录成功
-      console.log("登录成功?");
-      store.dispatch("user/getLoginUser", {
-        userName: "测试用户名",
-        userRole: "user",
-      });
-      router.push("/home");
-      console.log("登录成功?2");
+      try {
+        const response = await fetch(api.login, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            account: loginForm.username,
+            password: loginForm.password,
+          }),
+        });
 
-      // 真实逻辑,与后端交互
-      //   try {
-
-      //     const response = await axios.post("http://localhost:8000/login_post", {
-      //       name: loginForm.username,
-      //       password: loginForm.password,
-      //     });
-      //     const { isValid } = response.data;
-      //     if (isValid) {
-      //       store.dispatch("user/getLoginUser");
-      //       router.push("/home");
-      //     } else {
-      //       console.error("Login failed.");
-      //     }
-      //   } catch (error) {
-      //     console.error("Error logging in:", error);
-      //   }
+        if (response.ok) {
+          const data = await response.json();
+          store.dispatch("user/getLoginUser", {
+            userName: data.username,
+            userRole: "user",
+          });
+          router.push("/home");
+        } else {
+          console.error("Login failed.");
+        }
+      } catch (error) {
+        console.error("Error logging in:", error);
+      }
     }
   });
 };
