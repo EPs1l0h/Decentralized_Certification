@@ -35,17 +35,20 @@
         </div>
       </template>
       <el-row :gutter="20">
-        <el-col :span="8" v-for="vc in vcList" :key="vc.id">
-          <el-card shadow="hover">
+        <el-col :span="24" v-for="vc in vcList" :key="vc.id">
+          <el-card shadow="hover" @click="showVCDetail(vc)">
             <div class="vc-info">
-              <div class="vc-type">{{ vc.type[1] }}</div>
+              <div class="vc-type">{{ vc.type }}</div>
               <div class="vc-issuer">颁发者: {{ vc.issuer }}</div>
-              <div class="vc-date">颁发时间: {{ vc.issuanceDate }}</div>
+              <div class="vc-subject">内容: {{ vc.credentialSubject }}</div>
             </div>
           </el-card>
         </el-col>
       </el-row>
     </el-card>
+    <el-dialog title="VC详情" v-model="vcDetailDialogVisible" width="50%">
+      <pre>{{ vcDetailJson }}</pre>
+    </el-dialog>
 
     <!-- VP请求列表 -->
     <el-card class="vp-request-list">
@@ -104,11 +107,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { Bell, UserFilled } from "@element-plus/icons-vue";
 import api from "@/config/api"; // 引入全局配置文件
 
+let pollingInterval = null;
 const vcList = ref([]);
 const vpRequestList = ref([]);
 
@@ -129,11 +133,24 @@ const applyVCForm = ref({
   issuer: "",
   reason: "",
 });
+const vcDetailDialogVisible = ref(false);
+const vcDetailJson = ref("");
 
+const showVCDetail = (vc) => {
+  vcDetailJson.value = vc.jsonData;
+  vcDetailDialogVisible.value = true;
+};
 onMounted(async () => {
   await getHolderInfo();
   await getVCList();
-  await getVPRequestList();
+
+  // 开始轮询获取VP请求列表
+  pollingInterval = setInterval(getVPRequestList, 5000); // 每5秒轮询一次
+});
+
+onUnmounted(() => {
+  // 组件卸载时清除轮询
+  clearInterval(pollingInterval);
 });
 
 const getHolderInfo = async () => {
@@ -156,12 +173,23 @@ const getHolderInfo = async () => {
 
 const getVCList = async () => {
   try {
-    const response = await fetch(api.holderRequestVC);
+    const response = await fetch(api.holderRequestVC, {
+      method: "POST",
+    });
     const data = await response.json();
     if (data.isValid) {
-      vcList.value = data.VC;
+      const vc = JSON.parse(data.VC);
+      vcList.value = [
+        {
+          id: vc.id,
+          issuer: vc.issuer,
+          type: vc.type[1],
+          credentialSubject: vc.credentialSubject,
+          jsonData: JSON.stringify(vc, null, 2),
+        },
+      ];
     } else {
-      ElMessage.error("获取VC列表失败");
+      vcList.value = [];
     }
   } catch (error) {
     console.error("获取VC列表失败:", error);
@@ -176,9 +204,12 @@ const getVPRequestList = async () => {
     });
     const data = await response.json();
     if (data.isValid) {
-      vpRequestList.value = data.VC;
+      vpRequestList.value = data.VC.map(([verifier, requestDate]) => ({
+        verifier,
+        requestDate,
+      }));
     } else {
-      ElMessage.error("获取VP请求列表失败");
+      vpRequestList.value = [];
     }
   } catch (error) {
     console.error("获取VP请求列表失败:", error);
@@ -241,7 +272,7 @@ const handleVPRequest = async (request) => {
       ElMessage.success("已同意VP请求!");
       // 从VP请求列表中移除处理完的请求
       vpRequestList.value = vpRequestList.value.filter(
-        (item) => item.id !== request.id
+        (item) => item.verifier !== request.verifier
       );
     } else {
       ElMessage.error("处理VP请求失败");

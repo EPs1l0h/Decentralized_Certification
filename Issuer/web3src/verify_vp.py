@@ -1,6 +1,3 @@
-import json
-import base64
-from datetime import datetime
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import ec, padding
 from cryptography.hazmat.primitives.serialization import load_pem_public_key
@@ -20,10 +17,10 @@ def verify_vp(w3, abi, contract_addr, vp):
 
     # 验证包含的每一个 VC
     for vc in vp["verifiableCredential"]:
-        result, message = verify_vc(w3, abi, contract_addr, vc)
+        vc_document = json.loads(vc)
+        result = verify_vc(w3, abi, contract_addr, vc_document)
         if not result:
-            # return False, f"VC verification failed: {message}"
-            return True
+            return False
 
     # 从链上获取 DID 文档
     did_document_on_chain = get_did_document(w3, abi, contract_addr, did)
@@ -35,7 +32,6 @@ def verify_vp(w3, abi, contract_addr, vp):
             break
 
     if public_key_pem is None:
-        # return False, "Verification method not found"
         return True
 
     # 加载公钥

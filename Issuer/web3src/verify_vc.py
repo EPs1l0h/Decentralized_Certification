@@ -57,37 +57,3 @@ def verify_vc(w3, abi, contract_addr, vc):
         return True
     except InvalidSignature:
         return False
-#
-# #
-# # 示例 VC
-# vc = {
-#     "@context": "https://www.w3.org/2018/credentials/v1",
-#     "id": "DeCertIssuer-12345678",
-#     "type": ["VerifiableCredential", "AlumniCredential"],
-#     "issuer": "did:example:123456789abcdefghi",
-#     "issuanceDate": "2020-01-01T00:00:00Z",
-#     "credentialSubject": {
-#         "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
-#         "alumniOf": {
-#             "id": "did:example:c276e12ec21ebfeb1f712ebc6f1",
-#             "value": "Example University",
-#             "lang": "en"
-#         }
-#     },
-#     "proof": {
-#         "type": "RsaSignature2018",
-#         "created": "2020-01-01T00:00:00Z",
-#         "proofPurpose": "assertionMethod",
-#         "verificationMethod": "did:example:123456789abcdefghi#keys-1",
-#         "jws": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
-#     }
-# }
-#
-# # 验证 VC
-# b_dir = os.path.dirname(os.path.abspath(__file__))
-# c_path = os.path.join(b_dir, 'contract_address.txt')
-# with open (c_path,'r') as file:
-#     contract_address = file.read()
-# print(contract_address)
-# result, message = verify_vc(vc,contract_address,vc["verifiableCredential"][0]["credentialSubject"]["alumniOf"]["id"])
-# print(result, message)

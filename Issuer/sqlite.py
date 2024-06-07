@@ -2,6 +2,7 @@
 # 初始化数据库和表
 import sqlite3
 
+
 def init_db():
     conn = sqlite3.connect('accounts.db')
     cursor = conn.cursor()
@@ -17,7 +18,8 @@ def init_db():
 
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS key (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username INTEGER PRIMARY KEY AUTOINCREMENT,
+            kid INTEGER NOT NULL,
             DID TEXT NOT NULL,
             type_of_key TEXT NOT NULL,
             public_key_pem TEXT,
@@ -26,12 +28,21 @@ def init_db():
         ''')
 
     cursor.execute(('''CREATE TABLE IF NOT EXISTS VC (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        VCID TEXT NOT NULL,
-        VC_document TEXT NOT NULL
+        VC TEXT PRIMARY KEY
         )'''))
+
+    cursor.execute(('''CREATE TABLE IF NOT EXISTS AskedVP ( 
+       username TEXT PRIMARY KEY,
+       datetime TEXT NOT NULL,
+       ip_address TEXT NOT NULL
+       )'''))
+
+
     conn.commit()
     conn.close()
 
+
 def init_sqlite():
     init_db()
+
+init_sqlite()

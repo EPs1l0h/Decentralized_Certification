@@ -1,5 +1,5 @@
 // src/config/api.ts
-const API_BASE_URL = "http://localhost:5000"; // 根据实际情况修改
+const API_BASE_URL = "http://127.0.0.1:5000"; // 根据实际情况修改
 
 export default {
   register: `${API_BASE_URL}/register`,

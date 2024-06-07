@@ -13,10 +13,13 @@ export const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
     redirect: "/home",
+    meta: {
+      hideInMenu: true,
+    },
   },
   {
     path: "/home",
-    name: "首页",
+    name: "    首    页    ",
     component: HomeView,
   },
   {
@@ -41,6 +44,9 @@ export const routes: Array<RouteRecordRaw> = [
     path: "/blockInfo",
     name: "当前区块链信息",
     component: BlockInfoView,
+    meta: {
+      hideInMenu: true, // 该功能不实现
+    },
   },
   {
     path: "/login",

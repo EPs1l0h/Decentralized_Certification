@@ -77,6 +77,9 @@ const handleUserInfoClick = () => {
 .title {
   color: #444;
   margin-left: 16px;
+  font-size: 24px; /* 字稍微大一点点 */
+  font-weight: bold; /* 字稍微粗一些 */
+  font-family: "Arial", sans-serif; /* 使用好看的字体 */
 }
 
 .logo {
@@ -89,5 +92,10 @@ const handleUserInfoClick = () => {
 /* 添加以下样式 */
 :deep(.el-menu-item.is-active) {
   background-color: #e6f7ff;
+}
+
+/* 鼠标放到logo那里的时候不要有深色显示 */
+.title-bar:hover {
+  background-color: transparent;
 }
 </style>

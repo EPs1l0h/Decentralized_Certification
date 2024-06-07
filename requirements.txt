@@ -1,0 +1,7 @@
+Flask
+Flask-Cors
+requests
+web3
+pycryptodome
+py-solc-x
+cryptography

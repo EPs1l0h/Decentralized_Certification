@@ -28,7 +28,13 @@
           <el-form ref="requestForm" :model="requestForm" label-width="100px">
             <el-form-item label="持有者名称">
               <el-input
-                v-model="input_name"
+                v-model="holder_name"
+                placeholder="请输入持有者的用户名或DID"
+              ></el-input>
+            </el-form-item>
+            <el-form-item label="验证者名称">
+              <el-input
+                v-model="verify_name"
                 placeholder="请输入持有者的用户名或DID"
               ></el-input>
             </el-form-item>
@@ -119,21 +125,43 @@
             />
           </div>
         </el-card>
+
+        <!-- 验证成功界面 -->
+        <el-card v-if="step === 3" shadow="hover">
+          <template #header>
+            <div class="card-header">
+              <span>验证成功</span>
+              <el-icon class="icon" color="#67C23A"><SuccessFilled /></el-icon>
+            </div>
+          </template>
+          <div class="success-content">
+            <el-icon class="success-icon"><CircleCheckFilled /></el-icon>
+            <h2>恭喜,您已成功完成证书验证!</h2>
+            <p>
+              通过对持有者提交的可验证声明(VP)的验证,您确认了该持有者身份的真实性和可信性。这为后续与其开展各种信任协作奠定了基础。
+            </p>
+            <p>
+              基于可验证凭证体系,我们能够高效、可信地完成身份认证,同时保护个人隐私,推动多方协作。让我们共同见证价值互联网时代的到来!
+            </p>
+            <el-button type="primary" @click="reset">继续验证</el-button>
+          </div>
+        </el-card>
       </el-col>
     </el-row>
   </div>
 </template>
-
 <script setup lang="ts">
-import { ref, reactive } from "vue";
+import { ref, reactive, onUnmounted } from "vue";
 import { Promotion, Stamp } from "@element-plus/icons-vue";
-import api from "@/config/api"; // 导入全局的 API 配置
+import api from "@/config/api";
 
 const requestForm = reactive({
-  holderName: "",
+  verifyName: "",
 });
 
-const input_name = ref("");
+const holder_name = ref("");
+const verify_name = ref("");
+
 const step = ref(0);
 const requesting = ref(false);
 
@@ -142,7 +170,6 @@ interface VCVP {
   credentialSubject: any;
   issuer: string;
   issuanceDate: string;
-  // 其他属性...
 }
 
 const vcvp = ref<VCVP | null>(null);
@@ -156,23 +183,23 @@ interface VerifyResult {
 
 const verifyResult = ref<VerifyResult | null>(null);
 
+let pollTimer: number | null = null;
+
 const handleRequest = async () => {
   requesting.value = true;
-  requestForm.holderName = input_name.value;
+  requestForm.verifyName = verify_name.value;
 
   try {
-    // 发起验证请求
     await fetch(api.askHolder, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ verify_username: input_name.value }),
+      body: JSON.stringify({ verify_username: verify_name.value }),
     });
 
     step.value = 1;
 
-    // 轮询获取VP
     const pollVP = async () => {
       const response = await fetch(api.checkVP, {
         method: "POST",
@@ -183,7 +210,7 @@ const handleRequest = async () => {
         vcvp.value = data.vp;
         step.value = 2;
       } else {
-        setTimeout(pollVP, 1000); // 如果没有获取到VP，则1秒后重新轮询
+        pollTimer = setTimeout(pollVP, 10000);
       }
     };
 
@@ -199,7 +226,6 @@ const handleVerify = async () => {
   verifying.value = true;
 
   try {
-    // 验证VP
     const response = await fetch(api.verifyVP, {
       method: "POST",
       headers: {
@@ -234,6 +260,12 @@ const handleVerify = async () => {
   verifying.value = false;
   step.value = 3;
 };
+
+onUnmounted(() => {
+  if (pollTimer) {
+    clearTimeout(pollTimer);
+  }
+});
 </script>
 <style scoped>
 .verify-view {

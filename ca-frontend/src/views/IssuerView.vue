@@ -1,4 +1,3 @@
-<!-- views/IssuerView.vue -->
 <template>
   <div class="issuer-view">
     <el-row justify="center" class="header">
@@ -28,15 +27,30 @@
           </template>
           <el-table :data="requestList" style="width: 100%">
             <el-table-column prop="username" label="申请者"></el-table-column>
-            <el-table-column prop="did" label="DID"></el-table-column>
+            <el-table-column label="DID">
+              <template #default="scope">
+                <el-button type="text" @click="showDIDDialog(scope.row.did)"
+                  >查看DID</el-button
+                >
+              </template>
+            </el-table-column>
             <el-table-column label="操作">
               <template #default="scope">
-                <el-button type="primary" @click="handleRequest(scope.row)">
-                  处理
-                </el-button>
+                <el-button type="primary" @click="handleRequest(scope.row)"
+                  >处理</el-button
+                >
               </template>
             </el-table-column>
           </el-table>
+
+          <el-dialog v-model="didDialogVisible" title="DID" width="50%">
+            <span>{{ selectedDID }}</span>
+            <template #footer>
+              <el-button type="primary" @click="didDialogVisible = false"
+                >确定</el-button
+              >
+            </template>
+          </el-dialog>
         </el-card>
 
         <!-- 验证DID界面 -->
@@ -88,6 +102,27 @@
               </el-button>
             </el-form-item>
           </el-form>
+        </el-card>
+
+        <!-- 颁发成功界面 -->
+        <el-card v-if="step === 3" shadow="hover">
+          <template #header>
+            <div class="card-header">
+              <span>颁发成功</span>
+              <el-icon class="icon" color="#67C23A"><SuccessFilled /></el-icon>
+            </div>
+          </template>
+          <div class="success-content">
+            <el-icon class="success-icon"><CircleCheckFilled /></el-icon>
+            <h2>恭喜,您已成功为持有者颁发可验证凭证(VC)!</h2>
+            <p>
+              颁发的VC将为持有者提供可信的数字身份凭证,帮助他们在各种场景中便捷地进行身份验证和授权访问。这是基于区块链和密码学技术实现的安全、隐私保护和去中心化的解决方案。
+            </p>
+            <p>
+              您作为可信的颁发机构,为整个生态系统的发展做出了重要贡献。让我们携手共建未来信任的数字世界!
+            </p>
+            <el-button type="primary" @click="reset">颁发更多VC</el-button>
+          </div>
           <el-alert
             v-if="vcResult"
             :title="vcResult.title"
@@ -104,7 +139,13 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { List, Checked, Postcard } from "@element-plus/icons-vue";
+import {
+  List,
+  Checked,
+  Postcard,
+  SuccessFilled,
+  CircleCheckFilled,
+} from "@element-plus/icons-vue";
 import axios from "axios";
 import API from "@/config/api";
 
@@ -112,7 +153,13 @@ const step = ref(0);
 const selectedRequest = ref({});
 const verifying = ref(false);
 const issuing = ref(false);
+const didDialogVisible = ref(false);
+const selectedDID = ref("");
 
+const showDIDDialog = (did: string) => {
+  selectedDID.value = did;
+  didDialogVisible.value = true;
+};
 interface Request {
   username: string;
   did: string;
@@ -209,6 +256,7 @@ const issueVC = async () => {
         type: "success",
         vc: JSON.stringify(vc, null, 2),
       };
+      step.value = 3;
     } else {
       vcResult.value = {
         title: "颁发失败",
@@ -225,6 +273,17 @@ const issueVC = async () => {
     };
   }
   issuing.value = false;
+};
+
+const reset = () => {
+  step.value = 0;
+  selectedRequest.value = {};
+  vcForm.value = {
+    credential_subject: "",
+    vc_type: "",
+    kid: "",
+  };
+  vcResult.value = null;
 };
 </script>
 
@@ -268,5 +327,31 @@ const issueVC = async () => {
 
 .vc-result {
   margin-top: 1.5rem;
+}
+
+.success-content {
+  text-align: center;
+}
+
+.success-icon {
+  font-size: 4rem;
+  color: #67c23a;
+  margin-bottom: 1rem;
+}
+
+.success-content h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.success-content p {
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  color: #606266;
+}
+
+.success-content .el-button {
+  margin-top: 1rem;
 }
 </style>

@@ -1,50 +1,69 @@
-<!-- /src/views/RegisterView.vue -->
+根据 Element Plus 的 Select 组件 API 文档,我们需要对 CSS 进行以下修改: ```css
+.register-select.el-select { height: 50px; } .register-select.el-select
+.el-input__inner { height: 50px; } ``` 这里是修改后的完整代码:
+
 <template>
   <div class="register-container">
-    <el-card class="register-card">
+    <div class="register-card">
       <h2 class="register-title">注册 DeCert</h2>
       <el-form
         ref="registerFormRef"
         :model="registerForm"
         :rules="registerRules"
-        label-width="100px"
+        label-width="0px"
+        class="register-form"
       >
-        <el-form-item label="用户名" prop="username">
+        <el-form-item prop="username">
           <el-input
             v-model="registerForm.username"
             placeholder="请输入用户名"
+            prefix-icon="el-icon-user"
           ></el-input>
         </el-form-item>
-        <el-form-item label="密码" prop="password">
+        <el-form-item prop="password">
           <el-input
             type="password"
             v-model="registerForm.password"
             placeholder="请输入密码"
+            prefix-icon="el-icon-lock"
           ></el-input>
         </el-form-item>
-        <el-form-item label="确认密码" prop="confirmPassword">
+        <el-form-item prop="confirmPassword">
           <el-input
             type="password"
             v-model="registerForm.confirmPassword"
             placeholder="请再次输入密码"
+            prefix-icon="el-icon-lock"
           ></el-input>
         </el-form-item>
-        <el-form-item label="签名算法" prop="algorithm">
+        <el-form-item prop="algorithm">
           <el-select
             v-model="registerForm.algorithm"
             placeholder="请选择签名算法"
+            class="register-select"
+            prefix-icon="el-icon-s-grid"
           >
             <el-option label="SM2" value="SM2"></el-option>
             <el-option label="RSA" value="RSA"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleRegister">注册</el-button>
-          <el-button @click="goToLogin">返回登录</el-button>
-          <el-button @click="goToHome">返回首页</el-button>
+          <el-button
+            type="primary"
+            class="register-button"
+            @click="handleRegister"
+            >注册</el-button
+          >
         </el-form-item>
       </el-form>
-    </el-card>
+      <div class="login-link">
+        已有账号?
+        <el-button type="text" @click="goToLogin">立即登录</el-button>
+      </div>
+      <div class="home-link">
+        <el-button type="text" @click="goToHome">返回首页</el-button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -60,7 +79,7 @@ const registerForm = reactive({
   username: "",
   password: "",
   confirmPassword: "",
-  algorithm: "", // 添加算法字段
+  algorithm: "",
 });
 
 const registerRules = reactive<FormRules>({
@@ -95,10 +114,10 @@ const handleRegister = async () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            username: registerForm.username, // 添加用户名字段
+            username: registerForm.username,
             password: registerForm.password,
             password_confirm: registerForm.confirmPassword,
-            algorithm: registerForm.algorithm, // 添加算法字段
+            algorithm: registerForm.algorithm,
           }),
         });
         console.log(response);
@@ -124,8 +143,86 @@ const goToHome = () => {
 
 <style scoped>
 .register-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
   width: 100%;
-  max-width: 400px;
-  padding: 20px;
+  background-color: #fff;
+}
+
+.register-card {
+  width: 450px;
+  background-color: #fff;
+  padding: 4rem;
+  border-radius: 10px;
+  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.25);
+}
+
+.register-title {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  color: #333;
+}
+
+.register-form {
+  width: 100%;
+}
+
+.register-form .el-form-item {
+  margin-bottom: 2rem;
+}
+
+.register-form .el-input,
+.register-form .el-select {
+  height: 50px;
+  font-size: 1.2rem;
+}
+
+.register-form .el-input__prefix {
+  left: 10px;
+  font-size: 1.5rem;
+  color: #999;
+}
+
+.register-select {
+  width: 100%;
+}
+
+.register-select.el-select {
+  height: 50px;
+}
+
+.register-select.el-select .el-input__inner {
+  height: 50px;
+}
+
+.register-button {
+  width: 100%;
+  height: 50px;
+  font-size: 1.2rem;
+  background-color: #409eff;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.5s;
+  margin-top: 1rem;
+}
+
+.register-button:hover {
+  background-color: #66b1ff;
+}
+
+.login-link,
+.home-link {
+  text-align: center;
+  color: #666;
+  margin-top: 1rem;
+}
+
+.login-link .el-button,
+.home-link .el-button {
+  color: #409eff;
 }
 </style>

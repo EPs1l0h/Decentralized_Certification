@@ -1,5 +1,22 @@
-标识符注册机构使用方法放在Issuer的readme
+# readme
+## 代码运行
+### 后端
+```shell
+conda create -n ca python=3.8 -y
+pip install -r requirements.txt
+```
+打开一个终端开启ganache-cli，开启区块链服务，不要中断
+```shell
+npm install -g ganache-cli
+```
+再打开一个终端运行后端程序
+```shell
+python app.py
+```
+### 前端
+```shell
+npm install
+npm run serve
+```
 
-TODO:
-deploy.py需要与用户账号对接（目前是写死一个账号用该账号来操作，改成数据库里取该用户拥有的账号）
-interact_with_contract.py是与合约交互用的，这部分正在改
+## 代码介绍

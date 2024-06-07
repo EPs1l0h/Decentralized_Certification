@@ -41,24 +41,3 @@ def Signature(did_document, type_of_proof, private_key_pem):
         raise ValueError(f"Unsupported type_of_proof: {type_of_proof}")
 
     return signature.hex()
-
-# # 示例用法
-# did_document = {
-#     "context": "https://www.w3.org/ns/did/v1",
-#     "id": "did:example:123456789abcdefghi",
-#     "created": "2023-01-01T00:00:00Z",
-#     "updated": "2023-01-01T00:00:00Z",
-#     "version": "1.0",
-#     "verificationMethods": [],
-#     "proof": {}
-# }
-#
-# type_of_proof = "RSA"
-# private_key_pem = """
-# -----BEGIN RSA PRIVATE KEY-----
-# ...
-# -----END RSA PRIVATE KEY-----
-# """
-#
-# signature = Signature(did_document, type_of_proof, private_key_pem)
-# print(f"Signature: {signature}")

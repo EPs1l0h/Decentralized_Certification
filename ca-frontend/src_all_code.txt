@@ -293,7 +293,7 @@ export default checkAccess;
 
 ----- Start of config/api.ts -----
 // src/config/api.ts
-const API_BASE_URL = "http://localhost:5000"; // 根据实际情况修改
+const API_BASE_URL = "http://10.21.246.227:5000"; // 根据实际情况修改
 
 export default {
   register: `${API_BASE_URL}/register`,
@@ -313,7 +313,6 @@ export default {
   registerDID: `${API_BASE_URL}/registerDID`,
   reqeustVerifyDID: `${API_BASE_URL}/reqeustVerifyDID`,
   giveVCToHolder: `${API_BASE_URL}/giveVCToHolder`,
-  // 其他 API 接口...
 };
 
 ----- End of config/api.ts -----
@@ -1061,13 +1060,13 @@ const issueVC = async () => {
 ----- End of views/IssuerView.vue -----
 
 ----- Start of views/RegisterView.vue -----
-<!--/src/views/RegisterView.vue-->
+<!-- /src/views/RegisterView.vue -->
 <template>
   <div class="register-container">
     <el-card class="register-card">
       <h2 class="register-title">注册 DeCert</h2>
       <el-form
-        ref="registerForm"
+        ref="registerFormRef"
         :model="registerForm"
         :rules="registerRules"
         label-width="100px"
@@ -1123,6 +1122,7 @@ const registerForm = reactive({
   username: "",
   password: "",
   confirmPassword: "",
+  algorithm: "", // 添加算法字段
 });
 
 const registerRules = reactive<FormRules>({
@@ -1141,6 +1141,7 @@ const registerRules = reactive<FormRules>({
       trigger: "blur",
     },
   ],
+  algorithm: [{ required: true, message: "请选择签名算法", trigger: "change" }],
 });
 
 const registerFormRef = ref<FormInstance>();
@@ -1156,12 +1157,14 @@ const handleRegister = async () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
+            username: registerForm.username, // 添加用户名字段
             password: registerForm.password,
             password_confirm: registerForm.confirmPassword,
+            algorithm: registerForm.algorithm, // 添加算法字段
           }),
         });
 
-        if (response.ok) {
+        if (response.status == 200) {
           router.push("/login");
         } else {
           console.error("Registration failed.");
@@ -1180,6 +1183,7 @@ const goToHome = () => {
   router.push("/");
 };
 </script>
+
 <style scoped>
 .register-container {
   width: 100%;
@@ -1191,7 +1195,7 @@ const goToHome = () => {
 ----- End of views/RegisterView.vue -----
 
 ----- Start of views/LoginView.vue -----
-<!--/src/views/LoginView.vue-->
+<!-- /src/views/LoginView.vue -->
 <template>
   <div class="login-container">
     <el-card class="login-card">
@@ -1203,12 +1207,15 @@ const goToHome = () => {
         label-width="80px"
       >
         <el-form-item label="用户名" prop="username">
-          <el-input v-model="_username" placeholder="请输入用户名"></el-input>
+          <el-input
+            v-model="loginForm.username"
+            placeholder="请输入用户名"
+          ></el-input>
         </el-form-item>
         <el-form-item label="密码" prop="password">
           <el-input
             type="password"
-            v-model="_password"
+            v-model="loginForm.password"
             placeholder="请输入密码"
           ></el-input>
         </el-form-item>
@@ -1284,6 +1291,7 @@ const goToHome = () => {
   router.push("/");
 };
 </script>
+
 <style scoped>
 .login-container {
   width: 100%;
