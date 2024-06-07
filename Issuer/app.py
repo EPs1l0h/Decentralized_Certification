@@ -3,7 +3,7 @@ import sqlite3
 import json
 import os
 from datetime import datetime, timezone
-
+from flask_cors import cross_origin
 from web3 import Web3
 from flask import Flask, request, jsonify
 import requests
@@ -80,6 +80,7 @@ def init_func():
     init_sqlite()
 
 @app.route('/checkUserName', methods=['GET'])
+@cross_origin()
 def checkUserName():
     """
     轮询，返回是否在线
@@ -93,6 +94,7 @@ def checkUserName():
 
 # 和持有者交互 - 注册
 @app.route('/register', methods=['POST'])
+@cross_origin()
 def register():
     """
     data = request.get_json()
@@ -100,17 +102,21 @@ def register():
     这里和数据库交互，从ganache_output.txt里面拿addr和私钥（上链用的是interact_with_contract.py里面的函数）
     """
     data = request.json
+    global user_name
+    user_name = data.get('username')
     password = data.get('password')
     password_confirm = data.get('password_confirm')
+    algorithm = data.get('algorithm')
 
     if password != password_confirm:
         return jsonify({"message": "Registration Failed"}), 401
-    registerDID()
+    registerDID(algorithm)
     # 返回
     return jsonify({"message": "Registration Successful"}), 200
 
 # 获取Holder信息
 @app.route('/get_holder_info', methods=['GET'])
+@cross_origin()
 def get_holder_info():
     """
     获取 username 和 did
@@ -138,6 +144,7 @@ def get_holder_info():
 
 # 和持有者交互 - 登录
 @app.route('/login', methods=['POST'])
+@cross_origin()
 def login():
     """
     data = request.get_json()
@@ -165,6 +172,7 @@ def login():
 
 
 @app.route('/requestAuthenticateDID', methods=['POST'])
+@cross_origin()
 def requestAuthenticateDID():
     """
     持有者发给颁发者DID
@@ -183,6 +191,7 @@ def requestAuthenticateDID():
     requests.post(url, headers=headers, data=data)
 
 @app.route('/holderRequestVC', methods=['POST'])
+@cross_origin()
 def holderRequestVC():
     """
     持有者返回已有的VC给前端
@@ -201,6 +210,7 @@ def holderRequestVC():
         return jsonify({'isValid': True, 'VC': vc_document})
 
 @app.route('/getBeAskedVPList', methods=['POST'])
+@cross_origin()
 def getBeAskedVPList():
     """
     持有者返回 VP 请求给前端
@@ -216,7 +226,8 @@ def getBeAskedVPList():
         conn.close()
         return jsonify({'isValid': False, 'VC': data}), 200
 
-@app.route('holderToVerifier', methods=['POST'])
+@app.route('/holderToVerifier', methods=['POST'])
+@cross_origin()
 def holderToVerifier():
     """
     持有者生成VP发给验证者
@@ -245,6 +256,7 @@ def holderToVerifier():
         return jsonify({'isValid': True}), 200
 
 @app.route('/recVerifyRequest', methods=['POST'])
+@cross_origin()
 def recVerifyRequest():
     """
     持有者就收验证者请求存到数据库
@@ -264,6 +276,7 @@ def recVerifyRequest():
 
 being_verified_vp = None
 @app.route('/getVP', methods=['POST'])
+@cross_origin()
 def getVP():
     """
     验证者接收VP
@@ -272,6 +285,7 @@ def getVP():
     being_verified_vp = request.json
 
 @app.route('/checkVP', methods=['POST'])
+@cross_origin()
 def checkVP():
     """
     返回给验证者前端 VP
@@ -279,7 +293,8 @@ def checkVP():
     global being_verified_vp
     if being_verified_vp:
         return jsonify({'vp': being_verified_vp})
-@app.route('verifyVP', methods=['POST'])
+@app.route('/verifyVP', methods=['POST'])
+@cross_origin()
 def verifyVP():
     """
     验证者验证VP
@@ -298,6 +313,7 @@ def get_current_time():
 
 
 @app.route('/askHolder', methods=['POST'])
+@cross_origin()
 def askHolder():
     """
     验证者给给持有者发送请求
@@ -317,6 +333,7 @@ def askHolder():
 
 being_verified_did = None
 @app.route('/recDID',  methods=['POST'])
+@cross_origin()
 def recDID():
     """
     颁发者接收DID
@@ -326,6 +343,7 @@ def recDID():
 
 
 @app.route('/getWhoRequestVerifyDID', methods=['POST'])
+@cross_origin()
 def getWhoRequestVerifyDID():
     """
     颁发者把DID发给前端
@@ -337,15 +355,13 @@ def getWhoRequestVerifyDID():
         did = being_verified_did['id']
         return jsonify({'isValid': True, 'username': did, 'DID': being_verified_did})
 
-@app.route('/registerDID', methods=['POST'])
-def registerDID():
+def registerDID(algorithm):
     """
     注册DID
     """
     global contract_addr
-    # data = request.json
-    # type_of_key = data.get('type_of_key') # 一个list，每项用来选择SM2 or RSA
-    type_of_key = ['RSA']
+    type_of_key = []
+    type_of_key.append(algorithm)
     public_key_pem = []
     private_key_pem = []
     from web3src.generate_key import generate_keys
@@ -387,6 +403,7 @@ def registerDID():
         # return jsonify({'did_document': did_document}), 201
 # 和颁发者交互
 @app.route('/reqeustVerifyDID', methods=['POST'])
+@cross_origin()
 def reqeustVerifyDID():
     """
     颁发者验证DID
@@ -420,6 +437,7 @@ def reqeustVerifyDID():
 
 
 @app.route('/giveVCToHolder', methods=['POST'])
+@cross_origin()
 def giveVCToHolder():
     """
     颁发者颁发VC
@@ -471,6 +489,7 @@ def giveVCToHolder():
 
 # 和验证者交互 - 验证VC
 @app.route('/verifyVC', methods=['POST'])
+@cross_origin()
 def verifyVC():
     """
     验证VC，这里不调用了，直接验证VP就行
@@ -598,11 +617,4 @@ def verifyVP(data):
 
 if __name__ == '__main__':
     init_func()
-    # 把下面函数的注释去掉，再把app.run注释掉可以调试运行
-    registerDID()
-    verifyDID()
-    generateVC()
-    verifyVC()
-    generateVP()
-    verifyVP()
-    # app.run(debug=True)
+    app.run(debug = True, port = 5000)

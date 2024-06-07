@@ -1,4 +1,4 @@
-<!--/src/views/LoginView.vue-->
+<!-- /src/views/LoginView.vue -->
 <template>
   <div class="login-container">
     <el-card class="login-card">
@@ -10,12 +10,15 @@
         label-width="80px"
       >
         <el-form-item label="用户名" prop="username">
-          <el-input v-model="_username" placeholder="请输入用户名"></el-input>
+          <el-input
+            v-model="loginForm.username"
+            placeholder="请输入用户名"
+          ></el-input>
         </el-form-item>
         <el-form-item label="密码" prop="password">
           <el-input
             type="password"
-            v-model="_password"
+            v-model="loginForm.password"
             placeholder="请输入密码"
           ></el-input>
         </el-form-item>
@@ -91,6 +94,7 @@ const goToHome = () => {
   router.push("/");
 };
 </script>
+
 <style scoped>
 .login-container {
   width: 100%;

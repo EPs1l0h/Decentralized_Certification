@@ -1,10 +1,10 @@
-<!--/src/views/RegisterView.vue-->
+<!-- /src/views/RegisterView.vue -->
 <template>
   <div class="register-container">
     <el-card class="register-card">
       <h2 class="register-title">注册 DeCert</h2>
       <el-form
-        ref="registerForm"
+        ref="registerFormRef"
         :model="registerForm"
         :rules="registerRules"
         label-width="100px"
@@ -60,6 +60,7 @@ const registerForm = reactive({
   username: "",
   password: "",
   confirmPassword: "",
+  algorithm: "", // 添加算法字段
 });
 
 const registerRules = reactive<FormRules>({
@@ -78,6 +79,7 @@ const registerRules = reactive<FormRules>({
       trigger: "blur",
     },
   ],
+  algorithm: [{ required: true, message: "请选择签名算法", trigger: "change" }],
 });
 
 const registerFormRef = ref<FormInstance>();
@@ -93,12 +95,14 @@ const handleRegister = async () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
+            username: registerForm.username, // 添加用户名字段
             password: registerForm.password,
             password_confirm: registerForm.confirmPassword,
+            algorithm: registerForm.algorithm, // 添加算法字段
           }),
         });
-
-        if (response.ok) {
+        console.log(response);
+        if (response.status == 200) {
           router.push("/login");
         } else {
           console.error("Registration failed.");
@@ -117,6 +121,7 @@ const goToHome = () => {
   router.push("/");
 };
 </script>
+
 <style scoped>
 .register-container {
   width: 100%;
