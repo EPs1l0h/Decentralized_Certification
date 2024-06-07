@@ -70,7 +70,7 @@ const handleLogin = async () => {
           }),
         });
 
-        if (response.ok) {
+        if (response.status == 200) {
           const data = await response.json();
           store.dispatch("user/getLoginUser", {
             userName: data.username,
