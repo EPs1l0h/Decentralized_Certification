@@ -4,17 +4,7 @@ from .get_signature import Signature
 from .tuple_to_json import did_document_to_json
 import json
 import os
-# # 连接到以太坊节点 (这里以本地节点为例)
-# w3 = Web3(Web3.HTTPProvider('http://127.0.0.1:8545'))
-#
-# # 读取ABI
-# b_dir = os.path.dirname(os.path.abspath(__file__))
-# c_path = os.path.join(b_dir, 'DIDRegistry_abi.json')
-# with open(c_path, 'r') as abi_file:
-#     abi = json.load(abi_file)
-#
-# # 使用提供的地址进行交易
-# account = w3.eth.accounts[0]
+
 
 def generate_did(w3, abi, account, contract_address, context, created, updated, version, publicKeyPems, typesOfKey):
     """在链上生成DID"""
@@ -87,33 +77,3 @@ def register_did(w3, abi, account_address, contract_address, public_key_pem, typ
     updated_did_document = get_did_document(w3, abi, contract_address, did)
     updated_did_document = did_document_to_json(updated_did_document)
     return updated_did_document
-# if __name__ == "__main__":
-#     # 生成DID
-#     did = generate_did(
-#         contract_address,
-#         "https://www.w3.org/ns/did/v1",
-#         "2023-06-01T00:00:00Z",
-#         "2023-06-01T00:00:00Z",
-#         "1.0",
-#         ["pem1", "pem2"],
-#         ["type1", "type2"]
-#     )
-#     print(f"Generated DID: {did}")
-#
-#
-#     # 获取DID Document
-#     did_document = get_did_document(contract_address, did)
-#     print(f"DID Document: {did_document}")
-#
-#     # 添加证明信息
-#     add_proof(
-#         contract_address,
-#         did,
-#         "exampleProof",
-#         "2023-06-01T00:00:00Z",
-#         "assertionMethod",
-#         "did:dc:123#key-0",
-#         "proofValue"
-#     )
-#     updated_did_document = get_did_document(contract_address, did)
-#     print(f"Updated DID Document: {updated_did_document}")

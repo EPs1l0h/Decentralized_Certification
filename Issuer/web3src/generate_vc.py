@@ -21,7 +21,7 @@ def sign_json(json_bytes, private_key_pem, algorithm):
             ),
             hashes.SHA256(),
         )
-    elif algorithm.upper() == 'ECDSA':
+    elif algorithm.upper() == 'ECDSA' or algorithm.upper() == 'SM2':
         signature = private_key.sign(json_bytes, ec.ECDSA(hashes.SHA256()))
     else:
         raise UnsupportedAlgorithm(f'Unsupported algorithm: {algorithm}')
@@ -66,30 +66,3 @@ def generate_vc(vc_type, issuer, credential_subject, key_id, private_key_pem, si
     vc["proof"] = proof
 
     return vc
-#
-#
-# # 示例输入
-# vc_type = ["AlumniCredential"]
-# issuer = "https://example.edu/issuers/565049"
-# credential_subject = {
-#     "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
-#     "alumniOf": {
-#         "id": "did:example:c276e12ec21ebfeb1f712ebc6f1",
-#         "value": "Example University",
-#         "lang": "en"
-#     }
-# }
-#
-# # 示例私钥（PEM 格式）
-# private_key_pem = """
-# -----BEGIN RSA PRIVATE KEY-----
-# MIIEpAIBAAKCAQEA1X1+zO2+Zs3Pj5F9Z9zj6K5FQ5U5v+F2Z2Y5Q5Y5d5Y5F5W5
-# ...
-# -----END RSA PRIVATE KEY-----
-# """
-#
-# # 生成 VC 证书
-# vc_certificate = generate_vc(vc_type, issuer, credential_subject, private_key_pem)
-#
-# # 打印生成的 VC 证书
-# print(json.dumps(vc_certificate, indent=2))
