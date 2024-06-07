@@ -22,7 +22,7 @@
       </el-menu>
     </el-col>
     <el-col :span="2">
-      <div class="user-info">
+      <div class="user-info" v-if="!isVerifierOrIssuer">
         {{ userName }}
       </div>
     </el-col>
@@ -38,6 +38,7 @@ import checkAccess from "@/access/checkAccess";
 import ACCESS_ENUM from "@/access/accessEnum";
 
 const router = useRouter();
+const route = useRoute();
 const store = useStore();
 
 const userName = computed(() => store.state.user.loginUser.userName);
@@ -66,6 +67,13 @@ const handleUserInfoClick = () => {
     router.push("/login");
   }
 };
+
+// 判断当前路由是否为验证者或颁发者界面
+const isVerifierOrIssuer = computed(() => {
+  const verifierPaths = ["/issue", "/verifier/otherPath"]; // 添加所有验证者界面的路径
+  const issuerPaths = ["/verification", "/issuer/otherPath"]; // 添加所有颁发者界面的路径
+  return verifierPaths.includes(route.path) || issuerPaths.includes(route.path);
+});
 </script>
 
 <style scoped>

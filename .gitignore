@@ -1,2 +1,4 @@
 ./venv
 .idea/
+Issuer/accounts.db
+Issuer/contract_address
