@@ -19,4 +19,5 @@ export default {
   registerDID: `${API_BASE_URL}/registerDID`,
   reqeustVerifyDID: `${API_BASE_URL}/reqeustVerifyDID`,
   giveVCToHolder: `${API_BASE_URL}/giveVCToHolder`,
+  checkUserName: `${API_BASE_URL}/checkUserName`,
 };

@@ -70,13 +70,25 @@ const handleLogin = async () => {
           }),
         });
 
-        if (response.status == 200) {
+        if (response.status === 200) {
           const data = await response.json();
-          store.dispatch("user/getLoginUser", {
-            userName: data.username,
-            userRole: "user",
+          const response_username = await fetch(api.checkUserName, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
           });
-          router.push("/home");
+
+          const usernameData = await response_username.json();
+          if (usernameData.isValid) {
+            store.dispatch("user/getLoginUser", {
+              userName: usernameData.username,
+              userRole: "user",
+            });
+            router.push("/home");
+          } else {
+            console.error("Login verification failed.");
+          }
         } else {
           console.error("Login failed.");
         }
