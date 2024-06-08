@@ -17,7 +17,7 @@ export default {
   recDID: `${API_BASE_URL}/recDID`,
   getWhoRequestVerifyDID: `${API_BASE_URL}/getWhoRequestVerifyDID`,
   registerDID: `${API_BASE_URL}/registerDID`,
-  reqeustVerifyDID: `${API_BASE_URL}/reqeustVerifyDID`,
+  reqeustVerifyDID: `${API_BASE_URL}/requestVerifyDID`,
   giveVCToHolder: `${API_BASE_URL}/giveVCToHolder`,
   checkUserName: `${API_BASE_URL}/checkUserName`,
 };
