@@ -2,3 +2,8 @@
 .idea/
 Issuer/accounts.db
 Issuer/contract_address
+.hypothesis/
+decert-backend/__pycache__/
+decert-backend/web3src/__pycache__/
+decert-backend/accounts.db
+decert-backend/contract_address
