@@ -1,7 +1,5 @@
 ./venv
 .idea/
-Issuer/accounts.db
-Issuer/contract_address
 .hypothesis/
 decert-backend/__pycache__/
 decert-backend/web3src/__pycache__/
