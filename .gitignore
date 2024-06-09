@@ -1,0 +1,7 @@
+./venv
+.idea/
+.hypothesis/
+decert-backend/__pycache__/
+decert-backend/web3src/__pycache__/
+decert-backend/accounts.db
+decert-backend/contract_address
