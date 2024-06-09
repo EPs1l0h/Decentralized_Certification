@@ -596,22 +596,6 @@ def reqeustVerifyDID():
     data = request.get_json()  # 这里的data是一整个DID document的json，这里应该不能直接传，用json - string 转一下就行
     print("接收到前端的数据:")
     print(json.dumps(data, indent=4))
-    # data = {
-    #     '@context': ['https://www.w3.org/ns/did/v1'],
-    #     'id': 'did:dc:0adf883f21794e0a0f4cc274840c295ab617595a',
-    #     'created': '2024-06-03T06:33:41Z',
-    #     'updated': '2024-06-03T06:33:41Z',
-    #     'version': '1.0',
-    #     'verificationMethod': [{'id': 'did:dc:0adf883f21794e0a0f4cc274840c295ab617595a#key-1',
-    #                             'type': 'SM2',
-    #                             'publicKeyPem': '-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEv+VYFHhq+aFEWHp+SSSldxltbUmD\n8AgonywFoMQDxXBo2114qQ11unvJEjTyl1m4tWrDY6UO73WjPHMQU7W3VA==\n-----END PUBLIC KEY-----\n',
-    #                             'address': '0x0ADF883f21794E0a0f4cc274840C295ab617595A'}],
-    #     'proof': {'type': 'SM2',
-    #               'created': '2024-06-03T06:33:41Z',
-    #               'proofPurpose': 'assertionMethod',
-    #               'verificationMethod': 'did:dc:0adf883f21794e0a0f4cc274840c295ab617595a#key-1',
-    #               'proofValue': '30440220680cefe4910599dd119c89029663e0f2a58aae0b3eaf716b4c1ee2e04726a69d02201ec4c64943092df18c2f280ddc2b09f4e1ad29d5d1d015d5b12dc763850f6276'}
-    # }
 
     global contract_addr, w3, abi
     from web3src.verify_did import verify_did  # 导入verify_did模块
@@ -634,12 +618,6 @@ def giveVCToHolder():
     颁发者颁发VC
     """
     data = request.get_json()
-    # credential_subject = data.get('credential_subject') # 声明
-    # vc_type = data.get('vc_type') # VC类型
-    # kid = data.get('kid') # 采用第几个公私钥对进行签名
-
-    # private_key_pem = '-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCOU0dxNFY/+BtR\nGxN+lYZ+HGD8oN3XvkC2we/CffHJeY2GLAOxSY+f7anc8m9P3//jX0NN2h9Nc1p4\nzBXNt9sitDjnPtaBaMA7iyiDc/Q9gMxkaNWeCKdXkyC34zVM8NUBNWLpjF6feWc7\nwBgIEphHZGemQYTc5NOOTe++iEiqm1Et8cjbydNAkEn9/i/uqvil1A+TE8OxaCC2\nyNQrov2Gdix2d5+xiInwcfbbX7y8quTUxBw/J8D8Vx/QmGya8aj2lGxlUflXZEul\nZ5NplbWIMfohCygb/pmSSUAkrMH9CjuPO6tDK8jJ8//LpxEHsdbEXvQdIgwjBLQB\nXLiFEh+XAgMBAAECggEADWUZHDZox6x6Ja/+rbM07TmOhzg8qMlnHcwy3IMt9mBS\nSYZq8oyRz+N2US0f/MyAMM4Ob41P1OI+aZALnUjofuOnV1w6pANP1ErMjVKkcgVl\nNy4GrNDzrvJR6fygT5V69ponrQNhBHFQnfb+TAQ0AMQaXTNdZczDfGkpXy1EaYoA\nrXtSP2YXaIPSmke6IheP062Qmy7EowlLDVjkHp+QqQA9pcVQC6NYy/7bsGsVr5IX\nGzxskBwfMjuwlnJn16kadmEJHLUYRfHuzegiNx0CE9az/HwaxYyaN9SNHmt8oKSe\nmOKaobTEOOy+0ctdblEqVvC5sH05uHRDNqxGdY/uwQKBgQDGIRzI7chXNqQagfk9\nGbkFVCwnu242rIu9Bl86qEauoJbJAmZTdqR0nOJwY4/U6rJY28ij6vdpY75ziinq\ndlIK4EeGoEZofoj3WTqLgbDv+4Gi12obwoXWvzGK7JtEKunuUMfO6ZpSMuNZEeRp\nGGOh6pw2jafdOlhxSUeslV6jNQKBgQC35XxbdXZpK6f9F/rN5nkCdUrB9Y5Q2HQ1\nl62bMYbWrWOYVGa4xDaThwpkTF3DhJ2frHeo8zSv/GtmIHSOV7fEn/NE02WsR6pS\npN+pToZsh1gGzXGZEHMgRlw75wa9Zn6hr0uJ03NVe3dC1+KQSld56Og8BBErBU/N\nY28lwkdlGwKBgB3OL2letAvCsY83TEpPy1Cs5/OWM69P57mo8rx9QhzVFbnpfYFC\n0NymGT51C9co82mArr9SAqQ9GBKDj2ixIgh20uvCwrTHjE1BhBgmi3qeqFLZ+yFv\n8vhqTMasb3MizYxHZLeQ1uFUvHTSxzy0KZDbHWLrjnwuYc2xC3JACjudAoGBAK3q\nXr2wTRgRrYHy18M6oF7uxpDAxqM20lCM7ibDpB4LRRGfYLaE+ohzQiSxBEwQc3G7\nDj++Iqn9MyUWtKSZ2LYf/1WsB4/zBuW5/7yDAyZIqbtlOHXl1LtFT51nVDxzXndS\n7UGftIe3iIay3RZQ+IHW/ysjPYlOMLaxv0AaiKLZAoGARXlf770aqdV2N0cTJVuH\nnf+0iYpIqkpELoNv7FrvA0epP5ZcBDb0BWONurzcRxVEkGBidA5jwT11C/hdsZhW\nRp+hzl+Lyz5uaCi9YyZC3PZypoGOJhWKKaq9dgAaWzpdrFzhL9zwOc1Xd9KHz6Jd\nCtTfwG+7YXw4Bb+TxN4N1A8=\n-----END PRIVATE KEY-----\n'
-    # signature_algorithm = 'RSA' # 从数据库拿
 
     print("========== 开始执行 giveVCToHolder 函数 ==========")
     kid = data.get('kid')
@@ -686,48 +664,6 @@ def giveVCToHolder():
     print("========== giveVCToHolder 函数执行完毕 ==========\n")
     return jsonify(response_data)
 
-
-# 和验证者交互 - 验证VC
-@app.route('/verifyVC', methods=['POST'])
-@cross_origin()
-def verifyVC():
-    print("========== 开始执行 verifyVC 函数 ==========")
-    """
-    验证VC，这里不调用了，直接验证VP就行
-    """
-    # 获取请求数据
-    # data = request.get_json() 一整个 vc
-    json_string = """
-    {
-        "@context": "https://www.w3.org/2018/credentials/v1", 
-        "id": "DeCertIssuer-d5cbe332-caa8-4ece-adeb-3d50fd81b6aa", 
-        "type": ["VerifiableCredential", "AlumniCredential"], 
-        "issuer": "epsilon", 
-        "issuanceDate": "2024-06-02T18:50:50.996563+00:00", 
-        "credentialSubject": "I can play football", 
-        "proof": {
-            "type": "RSA", 
-            "created": "2024-06-02T18:50:51.028577+00:00", 
-            "proofPurpose": "assertionMethod", 
-            "verificationMethod": "epsilon/keys/1", 
-            "proofValue": "2cb1b6ed89b0cec4d49d12691d12285bac9eee26c99e3341bb50d0b82593446dab0bf789d10176fefa836da49ab7732929dafe670d6286a10ed03a595c48b3706aebbeed72a5062b8f62548c6abb49c94efdcea0a54fb17af329fda9ceffc115699b969eb8b86cc59a39808484be630c08a0972ace4c1b22a843f67816596d121321fd1a3038f2f185ef52b03bf9ac32ff22f605ee6b905530b785763fd52feb28125cf6d24d16250bc483b234c1abd682d49ab5489b15ad91471e918e47042799fb1c36e6b63ddae5e46d6b4fc5d7a724d9199d61dd57b4c03c2ec513e8ec9af568d301226df51c3815e55045daa991044d1420cf99d57a06c2566cac2e93f2"
-        }
-    }
-    """
-    data = json.loads(json_string)
-    print("接收到的VC数据:")
-    print(json.dumps(data, indent=4))
-
-    global w3, abi, contract_addr
-    from web3src.verify_vc import verify_vc
-    lld = verify_vc(w3, abi, contract_addr, data)
-    print("===============VERIFY_VC================")
-    print(lld)
-
-    print("========== verifyVC 函数执行完毕 ==========\n")
-    return lld  # 返回jsonfy信息
-
-
 def generateVP(verifiableCredential):
     """
     持有者生成VP
@@ -743,8 +679,6 @@ def generateVP(verifiableCredential):
 
     key_id = did + '#key-' + kid
     vp_type = 'VerifiablePresentation'
-    # private_key_pem = '-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCOU0dxNFY/+BtR\nGxN+lYZ+HGD8oN3XvkC2we/CffHJeY2GLAOxSY+f7anc8m9P3//jX0NN2h9Nc1p4\nzBXNt9sitDjnPtaBaMA7iyiDc/Q9gMxkaNWeCKdXkyC34zVM8NUBNWLpjF6feWc7\nwBgIEphHZGemQYTc5NOOTe++iEiqm1Et8cjbydNAkEn9/i/uqvil1A+TE8OxaCC2\nyNQrov2Gdix2d5+xiInwcfbbX7y8quTUxBw/J8D8Vx/QmGya8aj2lGxlUflXZEul\nZ5NplbWIMfohCygb/pmSSUAkrMH9CjuPO6tDK8jJ8//LpxEHsdbEXvQdIgwjBLQB\nXLiFEh+XAgMBAAECggEADWUZHDZox6x6Ja/+rbM07TmOhzg8qMlnHcwy3IMt9mBS\nSYZq8oyRz+N2US0f/MyAMM4Ob41P1OI+aZALnUjofuOnV1w6pANP1ErMjVKkcgVl\nNy4GrNDzrvJR6fygT5V69ponrQNhBHFQnfb+TAQ0AMQaXTNdZczDfGkpXy1EaYoA\nrXtSP2YXaIPSmke6IheP062Qmy7EowlLDVjkHp+QqQA9pcVQC6NYy/7bsGsVr5IX\nGzxskBwfMjuwlnJn16kadmEJHLUYRfHuzegiNx0CE9az/HwaxYyaN9SNHmt8oKSe\nmOKaobTEOOy+0ctdblEqVvC5sH05uHRDNqxGdY/uwQKBgQDGIRzI7chXNqQagfk9\nGbkFVCwnu242rIu9Bl86qEauoJbJAmZTdqR0nOJwY4/U6rJY28ij6vdpY75ziinq\ndlIK4EeGoEZofoj3WTqLgbDv+4Gi12obwoXWvzGK7JtEKunuUMfO6ZpSMuNZEeRp\nGGOh6pw2jafdOlhxSUeslV6jNQKBgQC35XxbdXZpK6f9F/rN5nkCdUrB9Y5Q2HQ1\nl62bMYbWrWOYVGa4xDaThwpkTF3DhJ2frHeo8zSv/GtmIHSOV7fEn/NE02WsR6pS\npN+pToZsh1gGzXGZEHMgRlw75wa9Zn6hr0uJ03NVe3dC1+KQSld56Og8BBErBU/N\nY28lwkdlGwKBgB3OL2letAvCsY83TEpPy1Cs5/OWM69P57mo8rx9QhzVFbnpfYFC\n0NymGT51C9co82mArr9SAqQ9GBKDj2ixIgh20uvCwrTHjE1BhBgmi3qeqFLZ+yFv\n8vhqTMasb3MizYxHZLeQ1uFUvHTSxzy0KZDbHWLrjnwuYc2xC3JACjudAoGBAK3q\nXr2wTRgRrYHy18M6oF7uxpDAxqM20lCM7ibDpB4LRRGfYLaE+ohzQiSxBEwQc3G7\nDj++Iqn9MyUWtKSZ2LYf/1WsB4/zBuW5/7yDAyZIqbtlOHXl1LtFT51nVDxzXndS\n7UGftIe3iIay3RZQ+IHW/ysjPYlOMLaxv0AaiKLZAoGARXlf770aqdV2N0cTJVuH\nnf+0iYpIqkpELoNv7FrvA0epP5ZcBDb0BWONurzcRxVEkGBidA5jwT11C/hdsZhW\nRp+hzl+Lyz5uaCi9YyZC3PZypoGOJhWKKaq9dgAaWzpdrFzhL9zwOc1Xd9KHz6Jd\nCtTfwG+7YXw4Bb+TxN4N1A8=\n-----END PRIVATE KEY-----\n'
-    # signature_algorithm = 'RSA' # 从数据库拿
 
     cursor.execute('SELECT private_key_pem from key WHERE kid = ?', (kid_int,))
     private_key_pem = cursor.fetchone()[0]

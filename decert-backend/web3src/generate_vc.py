@@ -1,6 +1,5 @@
 import json
 import uuid
-import base64
 from datetime import datetime, timezone
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding

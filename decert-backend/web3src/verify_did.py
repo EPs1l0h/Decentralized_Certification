@@ -1,4 +1,3 @@
-import json
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.serialization import load_pem_public_key
@@ -13,7 +12,6 @@ def verify_did(w3, abi, contract_address, did_document): # 输入addr
     did = did_document["id"]
     proof = did_document["proof"]
     verification_method_id = proof["verificationMethod"]
-    proof_value = proof["proofValue"]
     public_key_pem = None
     did_document = get_did_document(w3, abi, contract_address, did)
     # 从区块链上获取 DID 文档
@@ -43,10 +41,7 @@ def verify_did(w3, abi, contract_address, did_document): # 输入addr
             did_document_json,
             ec.ECDSA(hashes.SHA256())
         )
-        # print(True, "Verification successful")
         return True
     except InvalidSignature:
-        # print(False, "Invalid signature")
         return False
-        # return {"msg": "Verification successful"}
     
