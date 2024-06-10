@@ -2,6 +2,7 @@ from web3 import Web3
 from datetime import datetime, timezone
 from .get_signature import Signature
 from .tuple_to_json import did_document_to_json
+import json
 
 
 def generate_did(w3, abi, account, contract_address, context, created, updated, version, publicKeyPems, typesOfKey):

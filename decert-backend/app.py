@@ -586,9 +586,9 @@ def registerDID(algorithm):
 
 
 # 和颁发者交互
-@app.route('/reqeustVerifyDID', methods=['POST'])
+@app.route('/requestVerifyDID', methods=['POST'])
 @cross_origin()
-def reqeustVerifyDID():
+def requestVerifyDID():
     """
     颁发者验证DID
     """

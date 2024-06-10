@@ -5,7 +5,7 @@
 <template>
   <div class="register-container">
     <div class="register-card">
-      <h2 class="register-title">注册 DeCert</h2>
+      <h2 class="register-title">注册 BUPTBlockTrust</h2>
       <el-form
         ref="registerFormRef"
         :model="registerForm"

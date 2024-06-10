@@ -1,7 +1,7 @@
 <template>
   <div class="login-container">
     <div class="login-card">
-      <h2 class="login-title">欢迎来到 DeCert 世界</h2>
+      <h2 class="login-title">欢迎来到 BUPTBlockTrust</h2>
       <el-form
         ref="loginFormRef"
         :model="loginForm"

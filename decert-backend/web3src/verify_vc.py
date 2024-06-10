@@ -5,6 +5,7 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import ec
 from binascii import unhexlify
 from .interact_with_contract import *
+import json
 
 
 def verify_vc(w3, abi, contract_addr, vc):

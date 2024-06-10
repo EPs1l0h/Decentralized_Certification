@@ -4,6 +4,7 @@ from cryptography.hazmat.primitives.serialization import load_pem_public_key
 from cryptography.exceptions import InvalidSignature
 from .interact_with_contract import *
 from .verify_vc import verify_vc
+import json
 
 def verify_vp(w3, abi, contract_addr, vp):
     proof = vp["proof"]

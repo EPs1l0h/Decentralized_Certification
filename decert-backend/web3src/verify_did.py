@@ -4,6 +4,7 @@ from cryptography.hazmat.primitives.serialization import load_pem_public_key
 from cryptography.exceptions import InvalidSignature
 from .interact_with_contract import *
 from .tuple_to_json import did_document_to_json
+import json
 
 def verify_did(w3, abi, contract_address, did_document): # 输入addr
     # 从 DID 文档中提取必要信息

@@ -1,5 +1,4 @@
-# readme
-## 代码运行
+# 代码运行
 ### 后端
 ```shell
 conda create -n caa python=3.8 -y
@@ -28,5 +27,3 @@ cd ca-frontend
 npm install
 npm run serve
 ```
-
-## 代码介绍

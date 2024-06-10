@@ -2,9 +2,9 @@
   <div class="home">
     <el-row justify="center" align="middle" class="slogan">
       <el-col :span="24">
-        <h1>去中心化</h1>
-        <h2>基于区块链的身份管理系统</h2>
-        <p>安全、透明、高效,为您的证书提供可靠的存储和验证方案。</p>
+        <h1>BUPTBlockTrust</h1>
+        <h2>基于区块链的证书认证系统</h2>
+        <p>安全、透明、高效的去中心化CA。</p>
         <div class="buttons">
           <el-button
             type="primary"

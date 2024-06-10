@@ -1,3 +1,5 @@
+import json
+
 def did_document_to_json(data):
     # 构建verificationMethods的JSON结构
     verification_methods = [

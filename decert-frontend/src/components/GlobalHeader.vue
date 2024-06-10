@@ -9,7 +9,7 @@
         <el-menu-item key="0" :style="{ padding: 0, marginRight: '38px' }">
           <div class="title-bar">
             <img class="logo" src="../assets/logo.svg" />
-            <div class="title">DeCert</div>
+            <div class="title">BUPTBlockTrust</div>
           </div>
         </el-menu-item>
         <el-menu-item

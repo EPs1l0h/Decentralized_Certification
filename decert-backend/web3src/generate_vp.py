@@ -7,6 +7,7 @@ from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.serialization import load_pem_private_key
 from cryptography.exceptions import UnsupportedAlgorithm
+import json
 
 def sign_json(json_bytes, private_key_pem, algorithm):
     # Load the private key from PEM
